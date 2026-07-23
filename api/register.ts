@@ -1,0 +1,51 @@
+import { getSupabase } from './_lib/supabase';
+
+export default async function handler(req: any, res: any) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  try {
+    const supabase = getSupabase();
+    const { division, rollNumber, name, topic, isGroup, member2RollNumber, member2Name } = req.body || {};
+
+    if (!division || !rollNumber || !name || !topic) {
+      return res.status(400).json({ error: 'All fields are required.' });
+    }
+
+    if (isGroup && (!member2RollNumber || !member2Name)) {
+      return res.status(400).json({ error: 'Both Member 2 Roll Number and Name are required for group registration.' });
+    }
+
+    const normalizedName = String(name).trim();
+    const normalizedTopic = String(topic).trim();
+    const normMem2Name = isGroup ? String(member2Name).trim() : null;
+
+    // Supply a default pin ('0000') to satisfy NOT NULL database constraint on the pin column
+    const { error } = await supabase
+      .from('registrations')
+      .insert([
+        {
+          division,
+          roll_number: parseInt(rollNumber),
+          name: normalizedName,
+          topic: normalizedTopic,
+          member2_roll_number: isGroup ? parseInt(member2RollNumber) : null,
+          member2_name: normMem2Name,
+          pin: '0000'
+        },
+      ]);
+
+    if (error) {
+      if (error.code === '23505') {
+        return res.status(409).json({ error: 'A student with this Roll Number in this Division has already registered.' });
+      }
+      throw error;
+    }
+
+    return res.status(201).json({ message: 'Registration successful!' });
+  } catch (error: any) {
+    console.error('Register API Error:', error);
+    return res.status(500).json({ error: error.message || 'Internal server error.' });
+  }
+}

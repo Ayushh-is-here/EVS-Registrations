@@ -1,0 +1,1660 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EVS Presentation — Topic Registration</title>
+  <style>
+    :root {
+      --bg: oklch(98% 0.004 240);
+      --surface: oklch(100% 0 0);
+      --fg: oklch(20% 0.02 240);
+      --muted: oklch(50% 0.018 240);
+      --border: oklch(90% 0.006 240);
+      --accent: oklch(56% 0.12 170);
+      --accent-soft: oklch(94% 0.04 170);
+      --accent-hover: oklch(48% 0.12 170);
+      --success: oklch(52% 0.14 155);
+      --success-soft: oklch(95% 0.04 155);
+      --warn: oklch(68% 0.14 75);
+      --warn-soft: oklch(96% 0.04 75);
+      --danger: oklch(55% 0.18 25);
+      --danger-soft: oklch(96% 0.03 25);
+      --font-display: "Avenir Next", "Segoe UI", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      --radius: 16px;
+      --radius-sm: 12px;
+      --shadow: 0 1px 2px oklch(20% 0.02 240 / 0.04), 0 8px 24px oklch(20% 0.02 240 / 0.06);
+      --shadow-lg: 0 4px 12px oklch(20% 0.02 240 / 0.06), 0 20px 48px oklch(20% 0.02 240 / 0.08);
+      --nav-h: 72px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { min-height: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--fg);
+      font-size: 16px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button, input, select { font: inherit; color: inherit; }
+    button { cursor: pointer; border: none; background: none; }
+    a { color: inherit; text-decoration: none; }
+
+    #root { min-height: 100vh; }
+
+    .app-shell {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background:
+        radial-gradient(ellipse 80% 50% at 10% -10%, oklch(94% 0.04 170 / 0.55), transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 0%, oklch(96% 0.02 240 / 0.8), transparent 50%),
+        var(--bg);
+    }
+
+    /* —— Nav —— */
+    .top-nav {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: var(--nav-h);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      background: oklch(100% 0 0 / 0.78);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      width: 100%;
+      max-width: 1120px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(145deg, var(--accent), oklch(48% 0.1 160));
+      display: grid;
+      place-items: center;
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px oklch(56% 0.12 170 / 0.35);
+    }
+    .brand-mark svg { width: 22px; height: 22px; }
+    .brand-text { min-width: 0; }
+    .brand-title {
+      font-family: var(--font-display);
+      font-weight: 650;
+      font-size: 15px;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+    }
+    .brand-sub {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      background: oklch(96% 0.004 240);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+    .nav-pill {
+      position: relative;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 550;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      transition: color 0.15s, background 0.15s;
+      min-height: 36px;
+    }
+    .nav-pill:hover { color: var(--fg); }
+    .nav-pill.active {
+      background: var(--surface);
+      color: var(--fg);
+      box-shadow: 0 1px 3px oklch(20% 0.02 240 / 0.08);
+    }
+    .nav-pill.active::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 14px;
+      height: 2px;
+      border-radius: 2px;
+      background: var(--accent);
+    }
+
+    .nav-menu-btn {
+      display: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      align-items: center;
+      justify-content: center;
+      color: var(--fg);
+    }
+
+    /* —— Main —— */
+    .main {
+      flex: 1;
+      width: 100%;
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 32px 20px 64px;
+    }
+
+    .page-enter {
+      animation: rise 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    /* —— Shared layout —— */
+    .page-head {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 40px);
+      font-weight: 650;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+      color: var(--fg);
+    }
+    .page-desc {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 16px;
+      max-width: 42ch;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.55;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card-pad { padding: 28px 28px 32px; }
+
+    .form-card {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .field { margin-bottom: 18px; }
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .label {
+      display: block;
+      font-size: 13px;
+      font-weight: 550;
+      letter-spacing: 0.02em;
+      color: var(--fg);
+      margin-bottom: 8px;
+    }
+    .hint {
+      margin-top: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.01em;
+      line-height: 1.45;
+    }
+
+    .input, .select {
+      width: 100%;
+      height: 48px;
+      padding: 0 14px;
+      border-radius: var(--radius-sm);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--fg);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      outline: none;
+    }
+    .input::placeholder { color: oklch(70% 0.01 240); }
+    .input:hover, .select:hover { border-color: oklch(82% 0.01 240); }
+    .input:focus, .select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px oklch(56% 0.12 170 / 0.18);
+    }
+    .input:disabled, .select:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      background: oklch(97% 0.004 240);
+    }
+    .select {
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 6l4 4 4-4'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 40px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      padding: 0 20px;
+      border-radius: var(--radius-sm);
+      font-size: 15px;
+      font-weight: 550;
+      letter-spacing: 0.02em;
+      transition: transform 0.12s, background 0.15s, box-shadow 0.15s, opacity 0.15s;
+    }
+    .btn:active:not(:disabled) { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 1px 2px oklch(40% 0.08 170 / 0.2), 0 6px 16px oklch(56% 0.12 170 / 0.28);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      box-shadow: 0 2px 4px oklch(40% 0.08 170 / 0.25), 0 10px 24px oklch(56% 0.12 170 / 0.32);
+    }
+    .btn-secondary {
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 510;
+    }
+    .btn-secondary:hover:not(:disabled) {
+      color: var(--fg);
+      background: oklch(96% 0.004 240);
+    }
+    .btn-ghost {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      color: var(--fg);
+      min-height: 44px;
+    }
+    .btn-ghost:hover:not(:disabled) {
+      border-color: oklch(80% 0.01 240);
+      background: oklch(98% 0.004 240);
+    }
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    .btn-row .btn-ghost { flex: 0 0 34%; }
+    .btn-row .btn-primary { flex: 1; width: auto; }
+
+    .alert {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 14px;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+    .alert svg { flex-shrink: 0; margin-top: 1px; }
+    .alert-error {
+      background: var(--danger-soft);
+      color: var(--danger);
+      border: 1px solid oklch(55% 0.18 25 / 0.2);
+    }
+    .alert-warn {
+      background: var(--warn-soft);
+      color: oklch(45% 0.12 75);
+      border: 1px solid oklch(68% 0.14 75 / 0.25);
+    }
+    .alert-info {
+      background: var(--accent-soft);
+      color: oklch(35% 0.08 170);
+      border: 1px solid oklch(56% 0.12 170 / 0.2);
+    }
+    .alert a, .alert button.link {
+      color: inherit;
+      font-weight: 600;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      margin-top: 6px;
+      display: inline-block;
+    }
+
+    /* Success state */
+    .success-panel {
+      text-align: center;
+      padding: 20px 8px 8px;
+    }
+    .success-icon {
+      width: 72px;
+      height: 72px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      background: var(--success-soft);
+      color: var(--success);
+      display: grid;
+      place-items: center;
+      position: relative;
+    }
+    .success-icon::after {
+      content: "";
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1.5px solid oklch(52% 0.14 155 / 0.35);
+      animation: pulse-ring 1.6s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: 1; }
+      100% { transform: scale(1.18); opacity: 0; }
+    }
+    .success-title {
+      font-family: var(--font-display);
+      font-size: 26px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      margin-bottom: 10px;
+    }
+    .success-body {
+      color: var(--muted);
+      max-width: 34ch;
+      margin: 0 auto 24px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    /* Confirm box */
+    .confirm-box {
+      padding: 16px 18px;
+      border-radius: var(--radius-sm);
+      background: oklch(97% 0.008 170);
+      border: 1px solid oklch(90% 0.03 170);
+      margin-bottom: 18px;
+    }
+    .confirm-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .confirm-topic {
+      font-size: 17px;
+      font-weight: 550;
+      letter-spacing: -0.01em;
+      line-height: 1.3;
+    }
+    .confirm-topic span { color: var(--accent); }
+    .confirm-meta {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    /* File drop */
+    .file-drop {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 28px 20px;
+      text-align: center;
+      background: oklch(98.5% 0.004 240);
+      transition: border-color 0.15s, background 0.15s;
+      cursor: pointer;
+    }
+    .file-drop:hover, .file-drop.dragover {
+      border-color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .file-drop.has-file {
+      border-style: solid;
+      border-color: oklch(56% 0.12 170 / 0.35);
+      background: var(--accent-soft);
+    }
+    .file-drop input { display: none; }
+    .file-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 12px;
+      border-radius: 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      display: grid;
+      place-items: center;
+      color: var(--accent);
+    }
+    .file-title {
+      font-weight: 550;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+    .file-meta {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .check-row {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-top: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+    .check-row input {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* Steps */
+    .steps {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+    .step-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background 0.2s, transform 0.2s;
+    }
+    .step-dot.on {
+      background: var(--accent);
+      transform: scale(1.25);
+    }
+    .step-line {
+      width: 40px;
+      height: 2px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+    .step-line.on { background: oklch(56% 0.12 170 / 0.4); }
+
+    /* Topics dashboard */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      padding: 18px 20px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .stat-label {
+      font-size: 12px;
+      font-weight: 550;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .stat-value {
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .stat-value.accent { color: var(--accent); }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .filter-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .filter-pill {
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 510;
+      letter-spacing: 0.02em;
+      color: var(--muted);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      min-height: 36px;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .filter-pill:hover { color: var(--fg); border-color: oklch(82% 0.01 240); }
+    .filter-pill.active {
+      background: var(--fg);
+      border-color: var(--fg);
+      color: #fff;
+    }
+    .search-wrap {
+      position: relative;
+      width: min(260px, 100%);
+    }
+    .search-wrap svg {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+    .search-wrap .input {
+      height: 40px;
+      padding-left: 38px;
+      font-size: 14px;
+    }
+
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .topic-card {
+      padding: 18px;
+      border-radius: var(--radius);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      min-height: 148px;
+      transition: box-shadow 0.2s, border-color 0.2s, transform 0.2s;
+    }
+    .topic-card:hover {
+      box-shadow: var(--shadow-lg);
+      border-color: oklch(86% 0.01 240);
+      transform: translateY(-2px);
+    }
+    .topic-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .div-badge {
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: oklch(96% 0.004 240);
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 8px;
+    }
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 12px;
+      font-weight: 550;
+      letter-spacing: 0.02em;
+      padding: 4px 10px;
+      border-radius: 999px;
+    }
+    .status-pill.up {
+      color: var(--success);
+      background: var(--success-soft);
+    }
+    .status-pill.pend {
+      color: var(--muted);
+      background: oklch(96% 0.004 240);
+    }
+    .topic-name {
+      font-size: 16px;
+      font-weight: 550;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      flex: 1;
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 48px 24px;
+      border-radius: var(--radius);
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      color: var(--muted);
+    }
+
+    /* Guidelines */
+    .guide-wrap {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .guide-section {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .guide-section:last-child { border-bottom: none; padding-bottom: 4px; }
+    .guide-section:first-of-type { padding-top: 4px; }
+    .guide-h {
+      font-family: var(--font-display);
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.015em;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .guide-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 650;
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+    .guide-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .guide-list li {
+      display: flex;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+    .guide-list li::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 8px;
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+    .guide-list strong { color: var(--fg); font-weight: 600; }
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border: 2px solid oklch(100% 0 0 / 0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 40px;
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.02em;
+    }
+
+    /* Mobile nav drawer */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      background: oklch(20% 0.02 240 / 0.35);
+    }
+    .mobile-nav.open { display: block; }
+    .mobile-sheet {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: min(300px, 86vw);
+      background: var(--surface);
+      padding: 20px;
+      box-shadow: var(--shadow-lg);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: slide-in 0.25s ease-out;
+    }
+    @keyframes slide-in {
+      from { transform: translateX(100%); }
+      to { transform: none; }
+    }
+    .mobile-sheet a, .mobile-sheet button.nav-item {
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-weight: 550;
+      font-size: 15px;
+      color: var(--fg);
+    }
+    .mobile-sheet a.active, .mobile-sheet button.nav-item.active {
+      background: var(--accent-soft);
+      color: oklch(35% 0.08 170);
+    }
+    .mobile-close {
+      align-self: flex-end;
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    @media (max-width: 900px) {
+      .topic-grid { grid-template-columns: repeat(2, 1fr); }
+      .stats-row { grid-template-columns: 1fr 1fr 1fr; }
+    }
+    @media (max-width: 720px) {
+      .nav-pills { display: none; }
+      .nav-menu-btn { display: flex; }
+      .field-row { grid-template-columns: 1fr; }
+      .topic-grid { grid-template-columns: 1fr; }
+      .stats-row { grid-template-columns: 1fr; }
+      .card-pad { padding: 22px 20px 26px; }
+      .toolbar { flex-direction: column; align-items: stretch; }
+      .search-wrap { width: 100%; }
+      .main { padding-top: 24px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .page-enter, .success-icon::after { animation: none; }
+      .topic-card:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    const DIVISIONS = ["A", "B", "C", "D", "E-Commerce", "E-Arts"];
+    const NAV = [
+      { id: "register", label: "Register" },
+      { id: "upload", label: "Upload" },
+      { id: "topics", label: "Topics" },
+      { id: "guidelines", label: "Guidelines" },
+    ];
+
+    const SEED_TOPICS = [
+      { id: 1, division: "A", topic: "Urban Heat Islands in Pune", has_uploaded: true },
+      { id: 2, division: "A", topic: "Campus Waste Segregation Audit", has_uploaded: false },
+      { id: 3, division: "B", topic: "Microplastics in Freshwater Systems", has_uploaded: true },
+      { id: 4, division: "B", topic: "Solar Rooftop Feasibility for Hostels", has_uploaded: false },
+      { id: 5, division: "C", topic: "Biodiversity in Urban Parks", has_uploaded: true },
+      { id: 6, division: "C", topic: "E-Waste Collection Networks", has_uploaded: false },
+      { id: 7, division: "D", topic: "Sustainable Commute Choices", has_uploaded: true },
+      { id: 8, division: "E-Commerce", topic: "Green Packaging Alternatives", has_uploaded: false },
+      { id: 9, division: "E-Arts", topic: "Eco-Art from Recycled Materials", has_uploaded: true },
+      { id: 10, division: "D", topic: "Water Footprint of Campus Cafés", has_uploaded: false },
+    ];
+
+    const Icon = {
+      leaf: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z" />
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12" />
+        </svg>
+      ),
+      check: (
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 13l4 4L19 7" />
+        </svg>
+      ),
+      alert: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+        </svg>
+      ),
+      warn: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" /><path d="M12 8v4m0 4h.01" />
+        </svg>
+      ),
+      upload: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" />
+        </svg>
+      ),
+      file: (
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6M12 18v-6M9 15l3 3 3-3" />
+        </svg>
+      ),
+      search: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" />
+        </svg>
+      ),
+      checkSm: (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M5 13l4 4L19 7" />
+        </svg>
+      ),
+      clock: (
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+        </svg>
+      ),
+      menu: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M4 7h16M4 12h16M4 17h16" />
+        </svg>
+      ),
+      close: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+          <path d="M6 6l12 12M18 6L6 18" />
+        </svg>
+      ),
+    };
+
+    function loadStore() {
+      try {
+        const raw = localStorage.getItem("evs-od-store");
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      return { registrations: [], topics: SEED_TOPICS };
+    }
+    function saveStore(store) {
+      try { localStorage.setItem("evs-od-store", JSON.stringify(store)); } catch (_) {}
+    }
+
+    function useStore() {
+      const [store, setStore] = useState(loadStore);
+      const update = (fn) => {
+        setStore((prev) => {
+          const next = fn(prev);
+          saveStore(next);
+          return next;
+        });
+      };
+      return [store, update];
+    }
+
+    function PageHead({ eyebrow, title, desc }) {
+      return (
+        <header className="page-head" data-od-id="page-head">
+          {eyebrow && <div className="eyebrow" data-od-id="page-eyebrow">{eyebrow}</div>}
+          <h1 className="page-title" data-od-id="page-title">{title}</h1>
+          {desc && <p className="page-desc" data-od-id="page-desc">{desc}</p>}
+        </header>
+      );
+    }
+
+    function Alert({ type = "error", children }) {
+      return (
+        <div className={`alert alert-${type}`} role="alert" data-od-id="alert">
+          {type === "error" ? Icon.alert : Icon.warn}
+          <div>{children}</div>
+        </div>
+      );
+    }
+
+    function SuccessPanel({ title, body, cta, onCta }) {
+      return (
+        <div className="success-panel" data-od-id="success-panel">
+          <div className="success-icon" aria-hidden="true">{Icon.check}</div>
+          <h2 className="success-title">{title}</h2>
+          <p className="success-body">{body}</p>
+          <button type="button" className="btn btn-primary" onClick={onCta} data-od-id="success-cta">
+            {cta}
+          </button>
+        </div>
+      );
+    }
+
+    function RegistrationPage({ store, update, go }) {
+      const [form, setForm] = useState({ division: "", rollNumber: "", name: "", topic: "" });
+      const [busy, setBusy] = useState(false);
+      const [error, setError] = useState(null);
+      const [success, setSuccess] = useState(false);
+
+      const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+
+      const submit = (e) => {
+        e.preventDefault();
+        setError(null);
+        if (!form.division || !form.rollNumber || !form.name.trim() || !form.topic.trim()) {
+          setError("Please fill out all fields.");
+          return;
+        }
+        if (isNaN(Number(form.rollNumber)) || Number(form.rollNumber) <= 0) {
+          setError("Please enter a valid roll number.");
+          return;
+        }
+        const dup = store.registrations.find(
+          (r) =>
+            r.division === form.division &&
+            String(r.rollNumber) === String(form.rollNumber) &&
+            r.name.trim().toLowerCase() === form.name.trim().toLowerCase()
+        );
+        if (dup) {
+          setError("You’re already registered. Go to Upload to submit your file.");
+          return;
+        }
+        setBusy(true);
+        setTimeout(() => {
+          const id = Date.now();
+          update((s) => ({
+            ...s,
+            registrations: [
+              ...s.registrations,
+              {
+                id,
+                division: form.division,
+                rollNumber: String(form.rollNumber),
+                name: form.name.trim(),
+                topic: form.topic.trim(),
+                has_uploaded: false,
+              },
+            ],
+            topics: [
+              { id, division: form.division, topic: form.topic.trim(), has_uploaded: false },
+              ...s.topics,
+            ],
+          }));
+          setBusy(false);
+          setSuccess(true);
+        }, 650);
+      };
+
+      if (success) {
+        return (
+          <div className="page-enter" data-od-id="screen-register-success">
+            <div className="card form-card card-pad">
+              <SuccessPanel
+                title="Topic registered"
+                body="Your topic is locked in. Come back to Upload with your Division, Roll Number, and Name when you’re ready to submit."
+                cta="Go to Upload"
+                onCta={() => go("upload")}
+              />
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="page-enter" data-od-id="screen-register">
+          <PageHead
+            eyebrow="EVS Presentation"
+            title="Register your topic"
+            desc="Symbiosis College of Arts and Commerce — claim your presentation slot before upload day."
+          />
+          <div className="card form-card card-pad" data-od-id="register-card">
+            {error && (
+              <Alert>
+                {error}
+                {error.includes("already registered") && (
+                  <button type="button" className="link" onClick={() => go("upload")}>
+                    Open Upload page
+                  </button>
+                )}
+              </Alert>
+            )}
+            <form onSubmit={submit} noValidate data-od-id="register-form">
+              <div className="field-row">
+                <div className="field">
+                  <label className="label" htmlFor="reg-div">Division</label>
+                  <select
+                    id="reg-div"
+                    className="select"
+                    value={form.division}
+                    onChange={(e) => set("division", e.target.value)}
+                    disabled={busy}
+                    data-od-id="field-division"
+                  >
+                    <option value="">Select division</option>
+                    {DIVISIONS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="field">
+                  <label className="label" htmlFor="reg-roll">Roll number</label>
+                  <input
+                    id="reg-roll"
+                    className="input"
+                    type="number"
+                    inputMode="numeric"
+                    placeholder="e.g. 104"
+                    value={form.rollNumber}
+                    onChange={(e) => set("rollNumber", e.target.value)}
+                    disabled={busy}
+                    data-od-id="field-roll"
+                  />
+                </div>
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="reg-name">Full name</label>
+                <input
+                  id="reg-name"
+                  className="input"
+                  type="text"
+                  placeholder="As on college records"
+                  value={form.name}
+                  onChange={(e) => set("name", e.target.value)}
+                  disabled={busy}
+                  data-od-id="field-name"
+                />
+              </div>
+              <div className="field">
+                <label className="label" htmlFor="reg-topic">EVS topic</label>
+                <input
+                  id="reg-topic"
+                  className="input"
+                  type="text"
+                  placeholder="Title of your presentation"
+                  value={form.topic}
+                  onChange={(e) => set("topic", e.target.value)}
+                  disabled={busy}
+                  data-od-id="field-topic"
+                />
+                <p className="hint">Once registered, your topic cannot be changed online.</p>
+              </div>
+              <button type="submit" className="btn btn-primary" disabled={busy} data-od-id="btn-register">
+                {busy ? (<><span className="spinner" /> Registering…</>) : "Register topic"}
+              </button>
+              <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => go("upload")} data-od-id="link-to-upload">
+                Already registered? Upload here
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+    }
+
+    function UploadPage({ store, update, go }) {
+      const [step, setStep] = useState(1);
+      const [lookup, setLookup] = useState({ division: "", rollNumber: "", name: "" });
+      const [student, setStudent] = useState(null);
+      const [file, setFile] = useState(null);
+      const [replace, setReplace] = useState(false);
+      const [busy, setBusy] = useState(false);
+      const [error, setError] = useState(null);
+      const [done, setDone] = useState(false);
+      const [drag, setDrag] = useState(false);
+      const fileRef = useRef(null);
+
+      const setL = (k, v) => setLookup((f) => ({ ...f, [k]: v }));
+
+      const doLookup = (e) => {
+        e.preventDefault();
+        setError(null);
+        if (!lookup.division || !lookup.rollNumber || !lookup.name.trim()) {
+          setError("Please fill out all fields to find your registration.");
+          return;
+        }
+        setBusy(true);
+        setTimeout(() => {
+          const found = store.registrations.find(
+            (r) =>
+              r.division === lookup.division &&
+              String(r.rollNumber) === String(lookup.rollNumber) &&
+              r.name.trim().toLowerCase() === lookup.name.trim().toLowerCase()
+          );
+          setBusy(false);
+          if (!found) {
+            setError("Registration not found. Check your details or register first.");
+            return;
+          }
+          setStudent(found);
+          setStep(2);
+        }, 500);
+      };
+
+      const onFile = (f) => {
+        setError(null);
+        if (!f) return;
+        if (f.size > 50 * 1024 * 1024) {
+          setError("File is too large. Maximum size is 50MB.");
+          return;
+        }
+        const ext = f.name.split(".").pop()?.toLowerCase();
+        const ok = ["ppt", "pptx", "pdf"].includes(ext || "");
+        if (!ok) {
+          setError("Invalid file format. Please upload a .ppt, .pptx, or .pdf file.");
+          return;
+        }
+        setFile(f);
+      };
+
+      const doUpload = (e) => {
+        e.preventDefault();
+        if (!file) {
+          setError("Please select a file to upload.");
+          return;
+        }
+        if (student?.has_uploaded && !replace) {
+          setError("You must confirm replacement of your existing file.");
+          return;
+        }
+        setBusy(true);
+        setError(null);
+        setTimeout(() => {
+          update((s) => ({
+            ...s,
+            registrations: s.registrations.map((r) =>
+              r.id === student.id ? { ...r, has_uploaded: true } : r
+            ),
+            topics: s.topics.map((t) =>
+              t.id === student.id ? { ...t, has_uploaded: true } : t
+            ),
+          }));
+          setBusy(false);
+          setDone(true);
+        }, 900);
+      };
+
+      if (done) {
+        return (
+          <div className="page-enter" data-od-id="screen-upload-success">
+            <div className="card form-card card-pad">
+              <SuccessPanel
+                title="Upload complete"
+                body="Your presentation is on the EVS Drive. You’re set for presentation day — bring a USB backup just in case."
+                cta="Browse topics"
+                onCta={() => go("topics")}
+              />
+            </div>
+          </div>
+        );
+      }
+
+      return (
+        <div className="page-enter" data-od-id="screen-upload">
+          <PageHead
+            eyebrow="Submit presentation"
+            title={step === 1 ? "Find your registration" : "Upload your file"}
+            desc={
+              step === 1
+                ? "Enter the same Division, Roll Number, and Name you used to register."
+                : "PDF preferred · PPT/PPTX accepted · max 50MB"
+            }
+          />
+          <div className="steps" aria-hidden="true">
+            <div className={`step-dot ${step >= 1 ? "on" : ""}`} />
+            <div className={`step-line ${step >= 2 ? "on" : ""}`} />
+            <div className={`step-dot ${step >= 2 ? "on" : ""}`} />
+          </div>
+          <div className="card form-card card-pad" data-od-id="upload-card">
+            {error && (
+              <Alert>
+                {error}
+                {error.includes("not found") && (
+                  <button type="button" className="link" onClick={() => go("register")}>
+                    Go to Registration
+                  </button>
+                )}
+              </Alert>
+            )}
+
+            {step === 1 && (
+              <form onSubmit={doLookup} noValidate data-od-id="lookup-form">
+                <div className="field-row">
+                  <div className="field">
+                    <label className="label" htmlFor="up-div">Division</label>
+                    <select
+                      id="up-div"
+                      className="select"
+                      value={lookup.division}
+                      onChange={(e) => setL("division", e.target.value)}
+                      disabled={busy}
+                      data-od-id="lookup-division"
+                    >
+                      <option value="">Select division</option>
+                      {DIVISIONS.map((d) => (
+                        <option key={d} value={d}>{d}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label className="label" htmlFor="up-roll">Roll number</label>
+                    <input
+                      id="up-roll"
+                      className="input"
+                      type="number"
+                      placeholder="e.g. 104"
+                      value={lookup.rollNumber}
+                      onChange={(e) => setL("rollNumber", e.target.value)}
+                      disabled={busy}
+                      data-od-id="lookup-roll"
+                    />
+                  </div>
+                </div>
+                <div className="field">
+                  <label className="label" htmlFor="up-name">Full name</label>
+                  <input
+                    id="up-name"
+                    className="input"
+                    type="text"
+                    placeholder="As entered during registration"
+                    value={lookup.name}
+                    onChange={(e) => setL("name", e.target.value)}
+                    disabled={busy}
+                    data-od-id="lookup-name"
+                  />
+                </div>
+                <button type="submit" className="btn btn-primary" disabled={busy} data-od-id="btn-lookup">
+                  {busy ? (<><span className="spinner" /> Verifying…</>) : "Next: Upload file"}
+                </button>
+                <button type="button" className="btn btn-secondary" disabled={busy} onClick={() => go("register")}>
+                  ← Back to registration
+                </button>
+              </form>
+            )}
+
+            {step === 2 && student && (
+              <form onSubmit={doUpload} noValidate data-od-id="upload-form">
+                <div className="confirm-box" data-od-id="confirm-registration">
+                  <div className="confirm-label">Confirming registration</div>
+                  <div className="confirm-topic">
+                    Topic: <span>{student.topic}</span>
+                  </div>
+                  <div className="confirm-meta">
+                    Div {student.division} · Roll {student.rollNumber} · {student.name}
+                  </div>
+                </div>
+
+                {student.has_uploaded && (
+                  <div className="alert alert-warn" data-od-id="replace-warn">
+                    {Icon.warn}
+                    <div>
+                      <strong>A file is already uploaded for this topic.</strong>
+                      <label className="check-row">
+                        <input
+                          type="checkbox"
+                          checked={replace}
+                          onChange={(e) => setReplace(e.target.checked)}
+                        />
+                        <span>I confirm I want to <strong>replace</strong> the existing presentation.</span>
+                      </label>
+                    </div>
+                  </div>
+                )}
+
+                <div className="field">
+                  <span className="label">Presentation file</span>
+                  <div
+                    className={`file-drop ${drag ? "dragover" : ""} ${file ? "has-file" : ""}`}
+                    onClick={() => !(student.has_uploaded && !replace) && fileRef.current?.click()}
+                    onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
+                    onDragLeave={() => setDrag(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDrag(false);
+                      if (student.has_uploaded && !replace) return;
+                      onFile(e.dataTransfer.files?.[0]);
+                    }}
+                    data-od-id="file-drop"
+                  >
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept=".ppt,.pptx,.pdf"
+                      disabled={busy || (student.has_uploaded && !replace)}
+                      onChange={(e) => onFile(e.target.files?.[0])}
+                    />
+                    <div className="file-icon">{file ? Icon.file : Icon.upload}</div>
+                    <div className="file-title">
+                      {file ? file.name : "Drop file here or click to browse"}
+                    </div>
+                    <div className="file-meta">
+                      {file
+                        ? `${(file.size / (1024 * 1024)).toFixed(1)} MB · .${file.name.split(".").pop()}`
+                        : ".ppt, .pptx, or .pdf · max 50MB"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="btn-row">
+                  <button
+                    type="button"
+                    className="btn btn-ghost"
+                    disabled={busy}
+                    onClick={() => { setStep(1); setFile(null); setError(null); }}
+                    data-od-id="btn-cancel-upload"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={busy || !file || (student.has_uploaded && !replace)}
+                    data-od-id="btn-upload"
+                  >
+                    {busy ? (<><span className="spinner" /> Uploading…</>) : "Upload file"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function TopicsPage({ store }) {
+      const [div, setDiv] = useState("All");
+      const [q, setQ] = useState("");
+
+      const divisions = useMemo(() => {
+        const set = new Set(store.topics.map((t) => t.division));
+        return ["All", ...Array.from(set).sort()];
+      }, [store.topics]);
+
+      const filtered = useMemo(() => {
+        return store.topics.filter((t) => {
+          if (div !== "All" && t.division !== div) return false;
+          if (q.trim() && !t.topic.toLowerCase().includes(q.trim().toLowerCase())) return false;
+          return true;
+        });
+      }, [store.topics, div, q]);
+
+      const uploaded = store.topics.filter((t) => t.has_uploaded).length;
+      const pending = store.topics.length - uploaded;
+
+      return (
+        <div className="page-enter" data-od-id="screen-topics">
+          <PageHead
+            eyebrow="Class board"
+            title="Registered topics"
+            desc="Browse what peers are presenting. Names and roll numbers stay private."
+          />
+
+          <div className="stats-row" data-od-id="topics-stats">
+            <div className="stat-card">
+              <div className="stat-label">Total topics</div>
+              <div className="stat-value">{store.topics.length}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Uploaded</div>
+              <div className="stat-value accent">{uploaded}</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">Pending</div>
+              <div className="stat-value">{pending}</div>
+            </div>
+          </div>
+
+          <div className="toolbar" data-od-id="topics-toolbar">
+            <div className="filter-pills" role="tablist" aria-label="Filter by division">
+              {divisions.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  role="tab"
+                  aria-selected={div === d}
+                  className={`filter-pill ${div === d ? "active" : ""}`}
+                  onClick={() => setDiv(d)}
+                  data-od-id={`filter-${d.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  {d === "All" ? "All divisions" : `Div ${d}`}
+                </button>
+              ))}
+            </div>
+            <div className="search-wrap">
+              {Icon.search}
+              <input
+                className="input"
+                type="search"
+                placeholder="Search topics…"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                data-od-id="topics-search"
+              />
+            </div>
+          </div>
+
+          <div className="topic-grid" data-od-id="topics-grid">
+            {filtered.map((t) => (
+              <article key={t.id} className="topic-card" data-od-id={`topic-card-${t.id}`}>
+                <div className="topic-top">
+                  <span className="div-badge">Div {t.division}</span>
+                  {t.has_uploaded ? (
+                    <span className="status-pill up">{Icon.checkSm} Uploaded</span>
+                  ) : (
+                    <span className="status-pill pend">{Icon.clock} Pending</span>
+                  )}
+                </div>
+                <h3 className="topic-name">{t.topic}</h3>
+              </article>
+            ))}
+            {filtered.length === 0 && (
+              <div className="empty-state" data-od-id="topics-empty">
+                No topics match this filter yet.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    function GuidelinesPage({ go }) {
+      const sections = [
+        {
+          title: "Format & content",
+          items: [
+            <>Presentations should focus on <strong>Environmental Studies</strong> and sustainable practices.</>,
+            <>Submit your deck in <strong>PDF</strong> when possible for compatibility (PPT/PPTX also accepted).</>,
+            <>Include a clear title slide with Topic, Name, and Division.</>,
+            <>Limit text — use bullets and strong visuals to carry the story.</>,
+          ],
+        },
+        {
+          title: "Time limits",
+          items: [
+            <>Each talk is strictly limited to <strong>5 minutes</strong>.</>,
+            <>A <strong>2-minute Q&A</strong> follows immediately after.</>,
+            <>Rehearse so you finish cleanly inside the window.</>,
+          ],
+        },
+        {
+          title: "Submission rules",
+          items: [
+            <>Register your topic first, then upload via the Upload page.</>,
+            <>Maximum file size is <strong>50MB</strong>.</>,
+            <>Bring a USB backup on presentation day.</>,
+          ],
+        },
+        {
+          title: "Evaluation criteria",
+          items: [
+            <>Relevance to Environmental Studies</>,
+            <>Clarity and structure of arguments</>,
+            <>Quality of research and data</>,
+            <>Communication skills and Q&A handling</>,
+          ],
+        },
+      ];
+
+      return (
+        <div className="page-enter" data-od-id="screen-guidelines">
+          <PageHead
+            eyebrow="How it works"
+            title="Presentation guidelines"
+            desc="Everything you need before you walk on stage — format, timing, and what graders look for."
+          />
+          <div className="card guide-wrap card-pad" data-od-id="guidelines-card">
+            {sections.map((s, i) => (
+              <section key={s.title} className="guide-section" data-od-id={`guide-section-${i + 1}`}>
+                <h2 className="guide-h">
+                  <span className="guide-num">{i + 1}</span>
+                  {s.title}
+                </h2>
+                <ul className="guide-list">
+                  {s.items.map((item, j) => (
+                    <li key={j}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+            <div style={{ marginTop: 24 }}>
+              <button type="button" className="btn btn-primary" onClick={() => go("register")} data-od-id="guide-cta">
+                Start registration
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    function App() {
+      const [page, setPage] = useState("register");
+      const [menu, setMenu] = useState(false);
+      const [store, update] = useStore();
+
+      const go = (id) => {
+        setPage(id);
+        setMenu(false);
+        window.scrollTo(0, 0);
+      };
+
+      useEffect(() => {
+        const onKey = (e) => {
+          if (e.key === "Escape") setMenu(false);
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+      }, []);
+
+      return (
+        <div className="app-shell" data-od-id="app-shell">
+          <nav className="top-nav" data-od-id="top-nav">
+            <div className="nav-inner">
+              <button type="button" className="brand" onClick={() => go("register")} data-od-id="brand">
+                <div className="brand-mark" aria-hidden="true">{Icon.leaf}</div>
+                <div className="brand-text">
+                  <div className="brand-title">EVS Presentation</div>
+                  <div className="brand-sub">Symbiosis College of Arts & Commerce</div>
+                </div>
+              </button>
+
+              <div className="nav-pills" data-od-id="nav-pills">
+                {NAV.map((n) => (
+                  <button
+                    key={n.id}
+                    type="button"
+                    className={`nav-pill ${page === n.id ? "active" : ""}`}
+                    onClick={() => go(n.id)}
+                    data-od-id={`nav-${n.id}`}
+                  >
+                    {n.label}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                type="button"
+                className="nav-menu-btn"
+                aria-label="Open menu"
+                onClick={() => setMenu(true)}
+                data-od-id="nav-menu"
+              >
+                {Icon.menu}
+              </button>
+            </div>
+          </nav>
+
+          <div className={`mobile-nav ${menu ? "open" : ""}`} onClick={() => setMenu(false)} data-od-id="mobile-nav">
+            <div className="mobile-sheet" onClick={(e) => e.stopPropagation()}>
+              <button type="button" className="mobile-close" aria-label="Close" onClick={() => setMenu(false)}>
+                {Icon.close}
+              </button>
+              {NAV.map((n) => (
+                <button
+                  key={n.id}
+                  type="button"
+                  className={`nav-item ${page === n.id ? "active" : ""}`}
+                  onClick={() => go(n.id)}
+                >
+                  {n.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <main className="main" data-od-id="main">
+            {page === "register" && <RegistrationPage store={store} update={update} go={go} />}
+            {page === "upload" && <UploadPage store={store} update={update} go={go} />}
+            {page === "topics" && <TopicsPage store={store} />}
+            {page === "guidelines" && <GuidelinesPage go={go} />}
+            <p className="footer-note">UI redesign prototype · flows match your live EVS Web app</p>
+          </main>
+        </div>
+      );
+    }
+
+    Object.assign(window, { App });
+    ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+  </script>
+</body>
+</html>
