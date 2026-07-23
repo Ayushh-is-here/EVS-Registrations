@@ -7,6 +7,13 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Environment & Secret files
+.env
+*.env
+server/.env
+server/service-account.json
+service-account.json
+
 node_modules
 dist
 dist-ssr
