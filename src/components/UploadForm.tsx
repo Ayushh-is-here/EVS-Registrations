@@ -127,17 +127,25 @@ ${studentDetails.name}`
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full max-w-[560px] px-2 sm:px-0"
+      className="w-full max-w-[520px] mx-auto px-2 sm:px-0"
     >
       <div className="editorial-card relative overflow-hidden !p-5 sm:!p-10">
-        <div className="mb-6 sm:mb-8 text-center">
+        <div className="mb-6 sm:mb-8 text-center flex flex-col items-center">
           <KineticHeading 
             as="h1" 
-            text="Email Presentation" 
-            className="text-3xl sm:text-4xl font-heading font-medium tracking-tight mb-2 text-ink"
+            text="EVS Submission" 
+            className="text-3xl sm:text-4xl font-heading font-medium tracking-tight mb-3 text-ink"
             glowSweep
           />
-          <p className="text-xs sm:text-sm text-ink-light font-sans font-light">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            className="text-ink-light text-sm sm:text-base font-medium mt-1"
+          >
+            Symbiosis College of Arts and Commerce
+          </motion.p>
+          <p className="text-xs text-ink-light/80 mt-1.5 font-sans">
             {step === 1 ? "Verify your student registration details" : "Send your presentation directly via Gmail"}
           </p>
         </div>

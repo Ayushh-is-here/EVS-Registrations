@@ -17,6 +17,11 @@ const KineticHeading: React.FC<KineticHeadingProps> = ({
   const Component = as;
   const words = text.split(' ');
 
+  // Separate margin classes (e.g. mb-2, mb-4, mb-6, my-*, mt-*) from other styling classes
+  const classList = className.split(' ').filter(Boolean);
+  const marginClasses = classList.filter(c => /^m[btlrxy]?-\d+/.test(c)).join(' ');
+  const nonMarginClasses = classList.filter(c => !/^m[btlrxy]?-\d+/.test(c)).join(' ');
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -42,8 +47,8 @@ const KineticHeading: React.FC<KineticHeadingProps> = ({
   };
 
   return (
-    <div className="relative inline-block">
-      <Component className={`${className} flex flex-wrap justify-center overflow-hidden py-2`}>
+    <div className={`relative inline-flex flex-col items-center ${marginClasses}`}>
+      <Component className={`${nonMarginClasses} flex flex-wrap justify-center overflow-visible pt-1 pb-3 leading-snug`}>
         <motion.span
           variants={containerVariants}
           initial="hidden"
@@ -60,10 +65,10 @@ const KineticHeading: React.FC<KineticHeadingProps> = ({
       
       {glowSweep && (
         <motion.div
-          className="absolute -bottom-1 left-0 h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent w-full opacity-50 blur-[1px]"
+          className="w-full h-[2px] bg-gradient-to-r from-transparent via-accent to-transparent opacity-60 blur-[0.5px] mt-0.5"
           initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 0.5 }}
-          transition={{ delay: 0.5 + words.length * 0.1, duration: 1, ease: 'easeOut' }}
+          animate={{ scaleX: 1, opacity: 0.6 }}
+          transition={{ delay: 0.5 + words.length * 0.1, duration: 0.8, ease: 'easeOut' }}
         />
       )}
     </div>

@@ -137,17 +137,17 @@ const RegistrationForm: React.FC = () => {
     >
       <div className={`editorial-card !p-0 ${error ? 'error-glow' : ''}`}>
         <div className="p-8 md:p-10 w-full h-full">
-          <div className="mb-10 text-center">
+          <div className="mb-10 text-center flex flex-col items-center">
             <KineticHeading
               text="EVS Registration"
-              className="text-4xl md:text-5xl mb-4 text-ink font-heading"
+              className="text-4xl md:text-5xl mb-3 text-ink font-heading"
               glowSweep
             />
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.8 }}
-              className="text-ink-light"
+              className="text-ink-light text-sm sm:text-base font-medium mt-1"
             >
               Symbiosis College of Arts and Commerce
             </motion.p>

@@ -17,11 +17,44 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Mobile Top Header with Theme Toggle */}
+      {/* Mobile Top Header with Title Label and Theme Toggle */}
       <div className="fixed top-0 left-0 right-0 z-50 flex md:hidden justify-between items-center px-4 py-3 bg-surface/80 backdrop-blur-lg border-b border-border/50">
-        <span className="font-heading font-bold text-sm tracking-tight text-ink">EVS Portal</span>
+        <Link to="/register" className="flex items-center gap-2">
+          <img src="/symbi.png" alt="Symbiosis Logo" className="w-6 h-6 object-contain" />
+          <div className="flex items-center gap-1.5">
+            <span className="font-heading font-bold text-sm tracking-tight text-ink">EVS Portal</span>
+            <span className="text-[10px] font-sans px-1.5 py-0.2 rounded-full bg-accent/15 text-accent font-semibold">SCAC</span>
+          </div>
+        </Link>
         <ThemeToggle />
       </div>
+
+      {/* Desktop Top-Left Corner Site Label / Title Badge */}
+      <motion.div 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
+        className="fixed top-6 left-6 z-50 hidden md:flex items-center pointer-events-auto"
+      >
+        <Link 
+          to="/register" 
+          className="flex items-center gap-2.5 px-4 py-2 bg-surface/80 backdrop-blur-md border border-border shadow-sm rounded-full group hover:border-accent/40 transition-all duration-300"
+        >
+          <img 
+            src="/symbi.png" 
+            alt="Symbiosis Logo" 
+            className="w-7 h-7 object-contain group-hover:scale-105 transition-transform" 
+          />
+          <div className="flex items-center gap-2">
+            <span className="font-heading font-bold text-sm tracking-tight text-ink group-hover:text-accent transition-colors">
+              EVS Portal
+            </span>
+            <span className="text-[11px] font-sans px-2 py-0.5 rounded-full bg-accent/10 text-accent font-medium border border-accent/20">
+              Symbiosis
+            </span>
+          </div>
+        </Link>
+      </motion.div>
 
       {/* Desktop Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 hidden md:flex justify-center mt-6 px-4 pointer-events-none">
