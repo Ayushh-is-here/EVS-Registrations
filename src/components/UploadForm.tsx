@@ -44,8 +44,9 @@ export default function UploadForm() {
     const roll = lookupData.rollNumber.trim();
     const name = lookupData.name.trim();
 
-    if (!roll || !name) {
-      setError('Please enter both your Roll Number and Full Name before proceeding.');
+    const rollNum = parseInt(roll);
+    if (isNaN(rollNum) || rollNum < 2000 || rollNum > 3000) {
+      setError('Please enter a valid Roll Number between 2000 and 3000.');
       return;
     }
 
@@ -182,7 +183,9 @@ ${studentDetails.name}`
               <input 
                 type="number"
                 id="rollNumber"
-                placeholder="e.g. 101"
+                min={2000}
+                max={3000}
+                placeholder="e.g. 2315"
                 value={lookupData.rollNumber}
                 onChange={(e) => setLookupData({ ...lookupData, rollNumber: e.target.value })}
                 className="editorial-input min-h-[48px] text-base"

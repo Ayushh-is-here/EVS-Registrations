@@ -16,8 +16,8 @@ export default async function handler(req: any, res: any) {
     const normalizedName = String(name).trim();
     const parsedRollNumber = parseInt(rollNumber);
 
-    if (isNaN(parsedRollNumber) || parsedRollNumber <= 0) {
-      return res.status(400).json({ error: 'Please enter a valid Roll Number.' });
+    if (isNaN(parsedRollNumber) || parsedRollNumber < 2000 || parsedRollNumber > 3000) {
+      return res.status(400).json({ error: 'Please enter a valid Roll Number between 2000 and 3000.' });
     }
 
     const { data: students, error: fetchError } = await supabase

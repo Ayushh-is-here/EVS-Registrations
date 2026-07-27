@@ -55,13 +55,13 @@ const RegistrationForm: React.FC = () => {
       return;
     }
 
-    if (isNaN(Number(formData.rollNumber)) || Number(formData.rollNumber) <= 0) {
-      setError('Please enter a valid roll number for Member 1.');
+    if (isNaN(Number(formData.rollNumber)) || Number(formData.rollNumber) < 2000 || Number(formData.rollNumber) > 3000) {
+      setError('Please enter a valid roll number between 2000 and 3000 for Member 1.');
       return;
     }
 
-    if (formData.isGroup && (isNaN(Number(formData.member2RollNumber)) || Number(formData.member2RollNumber) <= 0)) {
-      setError('Please enter a valid roll number for Member 2.');
+    if (formData.isGroup && (isNaN(Number(formData.member2RollNumber)) || Number(formData.member2RollNumber) < 2000 || Number(formData.member2RollNumber) > 3000)) {
+      setError('Please enter a valid roll number between 2000 and 3000 for Member 2.');
       return;
     }
 
@@ -77,7 +77,7 @@ const RegistrationForm: React.FC = () => {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Unable to submit registration right now. Please try again.');
+        throw new Error(data.error || `Registration failed (${response.status}). Please verify server setup or try again.`);
       }
 
       setSuccess(true);
@@ -190,7 +190,9 @@ const RegistrationForm: React.FC = () => {
                   name="rollNumber"
                   value={formData.rollNumber}
                   onChange={handleChange}
-                  placeholder="e.g. 104"
+                  min={2000}
+                  max={3000}
+                  placeholder="e.g. 2315"
                   className="editorial-input"
                   disabled={isSubmitting}
                 />
@@ -258,7 +260,9 @@ const RegistrationForm: React.FC = () => {
                       name="member2RollNumber"
                       value={formData.member2RollNumber}
                       onChange={handleChange}
-                      placeholder="e.g. 105"
+                      min={2000}
+                      max={3000}
+                      placeholder="e.g. 2316"
                       className="editorial-input"
                       disabled={isSubmitting}
                     />
