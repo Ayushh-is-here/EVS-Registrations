@@ -3,6 +3,10 @@
     {
       "source": "/api/admin/registrations/:id",
       "destination": "/api/admin/registrations?id=:id"
+    },
+    {
+      "source": "/((?!api/|.*\\..*).*)",
+      "destination": "/index.html"
     }
   ]
 }

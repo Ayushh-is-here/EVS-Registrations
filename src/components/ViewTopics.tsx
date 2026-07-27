@@ -28,7 +28,7 @@ const ViewTopics = () => {
         setTopics(data.topics || []);
       } catch (err: any) {
         console.error('Fetch topics error:', err);
-        setError('We couldn\'t load the registered topics at the moment. Please try refreshing in a few moments.');
+        setError(err.message || 'We couldn\'t load the registered topics at the moment. Please try refreshing in a few moments.');
       } finally {
         setLoading(false);
       }
