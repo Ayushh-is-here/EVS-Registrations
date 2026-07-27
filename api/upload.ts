@@ -2,7 +2,7 @@ import formidable from 'formidable';
 import fs from 'fs';
 import { google } from 'googleapis';
 import path from 'path';
-import { getSupabase } from './_lib/supabase';
+import { getSupabase } from './_lib/supabase.js';
 
 export const config = {
   api: {

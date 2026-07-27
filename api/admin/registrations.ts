@@ -1,4 +1,4 @@
-import { getSupabase } from '../_lib/supabase';
+import { getSupabase } from '../_lib/supabase.js';
 
 const ADMIN_PIN = process.env.ADMIN_PIN || '1092';
 

@@ -1,5 +1,5 @@
-import { getSupabase } from './_lib/supabase';
-import { getGoogleAuthToken } from './_lib/googleDrive';
+import { getSupabase } from './_lib/supabase.js';
+import { getGoogleAuthToken } from './_lib/googleDrive.js';
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
