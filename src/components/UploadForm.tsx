@@ -135,7 +135,7 @@ ${studentDetails.name}`
           <KineticHeading 
             as="h1" 
             text="EVS Submission" 
-            className="text-3xl sm:text-4xl font-heading font-medium tracking-tight mb-3 text-ink"
+            className="text-3xl sm:text-4xl font-heading font-bold tracking-tight mb-3 text-ink"
             glowSweep
           />
           <motion.p

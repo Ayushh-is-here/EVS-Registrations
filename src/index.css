@@ -4,37 +4,39 @@
 
 @layer base {
   :root {
-    --color-background: 0.98 0.01 120;
-    --color-surface: 1 0 0;
-    --color-ink: 0.25 0.02 140;
-    --color-ink-light: 0.55 0.03 140;
-    --color-accent: 0.70 0.15 140;
-    --color-accent-hover: 0.60 0.15 140;
-    --color-accent-soft: 0.95 0.05 140;
-    --color-success: 0.70 0.15 140; 
-    --color-success-soft: 0.95 0.05 150;
+    /* Premium Natural Sage/Forest Palette (Hue 125) */
+    --color-background: 0.98 0.015 125;
+    --color-surface: 0.995 0.005 125;
+    --color-ink: 0.22 0.03 125;
+    --color-ink-light: 0.45 0.04 125;
+    --color-accent: 0.55 0.14 125;
+    --color-accent-hover: 0.45 0.14 125;
+    --color-accent-soft: 0.92 0.06 125;
+    --color-success: 0.55 0.14 125; 
+    --color-success-soft: 0.92 0.06 125;
     --color-error: 0.60 0.15 25;
     --color-error-soft: 0.95 0.05 25;
     --color-warn: 0.75 0.15 70;
     --color-warn-soft: 0.95 0.05 70;
-    --color-border: 0.90 0.02 140;
+    --color-border: 0.88 0.03 125;
   }
 
   .dark {
-    --color-background: 0.18 0.02 140;
-    --color-surface: 0.22 0.02 140;
-    --color-ink: 0.95 0.01 140;
-    --color-ink-light: 0.75 0.02 140;
-    --color-accent: 0.75 0.15 140;
-    --color-accent-hover: 0.85 0.15 140;
-    --color-accent-soft: 0.25 0.05 140;
-    --color-success: 0.75 0.15 150;
-    --color-success-soft: 0.25 0.05 150;
+    /* Deep Pine/Forest Night */
+    --color-background: 0.13 0.02 125;
+    --color-surface: 0.18 0.025 125;
+    --color-ink: 0.96 0.01 125;
+    --color-ink-light: 0.70 0.03 125;
+    --color-accent: 0.68 0.14 125;
+    --color-accent-hover: 0.78 0.14 125;
+    --color-accent-soft: 0.22 0.05 125;
+    --color-success: 0.68 0.14 125;
+    --color-success-soft: 0.22 0.05 125;
     --color-error: 0.65 0.15 25;
     --color-error-soft: 0.25 0.05 25;
     --color-warn: 0.80 0.15 70;
     --color-warn-soft: 0.25 0.05 70;
-    --color-border: 0.30 0.02 140;
+    --color-border: 0.25 0.03 125;
   }
 
   body {
@@ -87,7 +89,7 @@
 @layer components {
   /* UI Card */
   .editorial-card {
-    @apply bg-surface shadow-md rounded-2xl p-6 md:p-10 w-full relative z-10 transition-all duration-200 border border-border;
+    @apply bg-surface/90 backdrop-blur-xl shadow-md rounded-2xl p-6 md:p-10 w-full relative z-10 transition-all duration-200 border border-border;
     max-width: 520px;
   }
   

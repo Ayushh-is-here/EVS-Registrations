@@ -48,8 +48,8 @@ const ViewTopics = () => {
       transition={{ duration: 0.5, ease: "easeOut" }}
       className="w-full max-w-4xl px-4 flex flex-col gap-8"
     >
-      <div className="text-center space-y-4">
-        <KineticHeading as="h1" text="Registered Topics" className="text-4xl text-ink font-heading" glowSweep />
+      <div className="text-center space-y-3 sm:space-y-4">
+        <KineticHeading as="h1" text="Registered Topics" className="text-3xl sm:text-4xl text-ink font-heading font-bold" glowSweep />
         <p className="text-ink-light max-w-lg mx-auto">
           Explore the topics registered by other students. Names and roll numbers are hidden for privacy.
         </p>

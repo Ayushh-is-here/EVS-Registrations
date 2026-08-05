@@ -34,8 +34,8 @@ export default {
         border: 'oklch(var(--color-border) / <alpha-value>)',
       },
       fontFamily: {
-        heading: ['"Avenir Next"', '"Segoe UI"', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
-        body: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Text"', '"Segoe UI"', 'system-ui', 'sans-serif'],
+        heading: ['Outfit', '-apple-system', 'sans-serif'],
+        body: ['"Plus Jakarta Sans"', '-apple-system', 'sans-serif'],
       },
       boxShadow: {
         'sm': '0 1px 2px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.06)',

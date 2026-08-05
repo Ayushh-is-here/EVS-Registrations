@@ -140,7 +140,7 @@ const RegistrationForm: React.FC = () => {
           <div className="mb-10 text-center flex flex-col items-center">
             <KineticHeading
               text="EVS Registration"
-              className="text-4xl md:text-5xl mb-3 text-ink font-heading"
+              className="text-3xl sm:text-4xl mb-3 text-ink font-heading font-bold"
               glowSweep
             />
             <motion.p

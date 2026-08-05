@@ -18,7 +18,7 @@ function App() {
         <Navbar />
         
         {/* Main Content Area adapted for mobile and desktop */}
-        <main className="w-full relative z-10 flex flex-col items-center justify-center pt-16 sm:pt-20 md:pt-28 pb-24 md:pb-12 flex-grow">
+        <main className="w-full relative z-10 flex flex-col items-center justify-center pt-24 sm:pt-28 md:pt-32 pb-24 md:pb-12 flex-grow">
           <Routes>
             {/* Default to register */}
             <Route path="/" element={<Navigate to="/register" replace />} />
