@@ -26,7 +26,7 @@ export interface BoardAssignmentDivision {
 export const INTERNAL_ASSIGNMENTS: InternalAssignment[] = [
   {
     id: 1,
-    title: 'Internal Assignment 1',
+    title: 'EVS Assignment 1 – Human and Environment',
     subtitle: 'Environmental Studies Core Concepts & Answers (~200 words each)',
     questions: [
       {
@@ -159,13 +159,295 @@ Key global impacts include:
 Combatting climate change requires global cooperation under treaties like the Paris Agreement, focusing on renewable energy transition, reforestation, energy efficiency, and carbon reduction technologies.`
       }
     ]
+  },
+  {
+    id: 2,
+    title: 'EVS Assignment 2 – Environmental Pollution',
+    subtitle: 'Indigenous Knowledge, Sacred Rules, Health & Environmental Ethics (~180 words each)',
+    questions: [
+      {
+        id: 1,
+        question: 'Write info about Indigenous knowledge (like crop, plants etc)',
+        answer: `Indigenous knowledge (IK) refers to the unique, traditional, local knowledge existing within and developed around the specific conditions of women and men indigenous to a particular geographic area. Inherited through generations, it encompasses deep insights into local ecosystems, seasonal cycles, native plant species, and agricultural practices.
+
+In agriculture, indigenous communities cultivate climate-resilient crop varieties such as landraces of ragi, bajra, sorghum, and heirloom rice like Navara and Kala Namak, which naturally tolerate drought, pests, and local soil conditions without synthetic inputs. Indigenous botanical knowledge also identifies the medicinal properties of native plants—such as Neem for pest management and antiseptic treatment, Tulsi for respiratory health, Turmeric for anti-inflammatory healing, and Amla for immunity.
+
+Seed preservation is another cornerstone, where seeds are stored in mud-plastered earthenware coated with ash and neem leaves to prevent insect infestation. Preserving indigenous knowledge is vital for food security, conserving agrobiodiversity, developing sustainable climate-adaptation strategies, and protecting traditional healthcare systems against commercial genetic homogenization.`
+      },
+      {
+        id: 2,
+        question: 'Write info about Indigenous community practices',
+        answer: `Indigenous community practices are traditional, sustainable living methods rooted in ecological harmony and collective resource stewardship. Developed over centuries, these practices prioritize long-term environmental conservation over short-term resource exploitation.
+
+A prime example is community-based water management, such as the construction of Johads (earthen check dams) in Rajasthan, Zabo systems in Nagaland, and Bamboo drip irrigation in Meghalaya, which efficiently capture rainwater and recharge subterranean aquifers without environmental degradation. In forestry, indigenous groups like the Warlis of Maharashtra practice sustainable resource harvesting, collecting only fallen deadwood and non-timber forest produce, ensuring natural forest regeneration.
+
+Sacred Groves (Devrais) represent another key practice where communities designate forest patches as sacred domains, enforcing strict taboos against logging or hunting to preserve pristine biodiversity. Furthermore, coastal indigenous fishing communities observe seasonal fishing bans during fish breeding periods to maintain marine populations. These self-regulating social norms, collective decision-making, and eco-friendly lifestyles provide invaluable blueprints for modern sustainable resource management.`
+      },
+      {
+        id: 3,
+        question: 'Short note on Sacred Rules',
+        answer: `Sacred rules are unwritten, traditional ecological laws and cultural taboos practiced by indigenous and rural communities to protect nature through spiritual reverence. Rooted in deep respect for the biosphere, these rules govern human interaction with natural resources, establishing boundaries that prevent over-exploitation.
+
+Key aspects of sacred rules include declaring specific forest areas as sacred groves (such as Devrais in Maharashtra, Kavu in Kerala, and Orans in Rajasthan), where cutting trees, collecting wood, or harming animals is strictly forbidden by social decree. Sacred rules also extend to individual tree species like Peepal (Ficus religiosa), Banyan (Ficus benghalensis), and Khejri (Prosopis cineraria), which are worshipped and legally protected from felling due to their ecological and cultural importance.
+
+Additionally, sacred rules dictate seasonal hunting and fishing bans during animal breeding cycles, ensuring wildlife population recovery. Water bodies like natural springs and sacred lakes (e.g., Khecheopalri Lake in Sikkim) are similarly guarded against human pollution. By blending spirituality with ecological preservation, sacred rules serve as effective, community-enforced conservation mechanisms.`
+      },
+      {
+        id: 4,
+        question: 'Info on threats to sacred rules in India',
+        answer: `In India, traditional sacred rules and community-led conservation systems face severe threats due to rapid modern socio-economic transformations. Urbanization, industrial expansion, and large-scale infrastructure projects (such as highways, dams, and mining operations) frequently encroach upon and fragment sacred groves and pristine natural habitats, ignoring traditional community boundaries.
+
+Modernization and shifting cultural values among younger generations have led to the gradual erosion of traditional belief systems, weakening respect for ancient taboos that historically protected sacred flora and fauna. Commercialization of natural resources, including illegal timber logging, poaching, and commercial agriculture, incentivizes short-term financial gains over long-term ecological protection.
+
+Furthermore, the absence of formal legal recognition for sacred groves under government land records exposes them to land acquisition and conversion. Environmental pollution from tourism, plastic waste dumping, and soil contamination further degrades sacred water bodies and forest ecosystems. Protecting these sacred rules requires integrating indigenous conservation rights into formal environmental governance, promoting public awareness, and granting legal protection to community-managed sanctuaries.`
+      },
+      {
+        id: 5,
+        question: 'Co-relate the following:- a) Environment & health b) Water & health c) Air & health d) Soil & health',
+        answer: `Human health is directly dependent on environmental quality across atmospheric, aquatic, and terrestrial systems:
+
+a) Environment & Health: Ecosystem stability ensures vital services like climate regulation, oxygen production, and disease control. Environmental degradation disrupts ecological balance, increasing vector-borne diseases (malaria, dengue) and heat-induced health crises.
+b) Water & Health: Clean water is essential for biological survival. Contaminated water carrying domestic sewage or industrial effluents causes fatal waterborne diseases like cholera, dysentery, and typhoid, while chemical pollutants like fluoride or heavy metals cause chronic toxicity.
+c) Air & Health: Clean air supplies vital oxygen. Air polluted with fine particulate matter (PM2.5, PM10), sulfur dioxide, and nitrogen oxides causes severe respiratory ailments including asthma, chronic bronchitis, reduced lung capacity, and cardiovascular disorders.
+d) Soil & Health: Healthy soil yields nutrient-rich food. Soil contaminated with agricultural pesticides, heavy metals, or industrial sludge transfers toxic residues into food crops, leading to bioaccumulation, digestive disorders, organ toxicity, and long-term carcinogenic health risks.
+
+Protecting all four environmental domains is essential for maintaining holistic human health.`
+      },
+      {
+        id: 6,
+        question: 'Difference between Radioactive activity & health',
+        answer: `Radioactivity and health represent a crucial relationship between nuclear physics and biological well-being. Radioactivity refers to the spontaneous breakdown of unstable atomic nuclei emitting ionizing radiation (alpha particles, beta particles, and gamma rays). Human health, in contrast, depends on cellular integrity and biochemical balance, which can be severely disrupted by exposure to radioactive materials.
+
+Ionizing radiation penetrates biological tissues, causing ionization of molecules and water within cells. This generates free radicals that break chemical bonds and damage cellular DNA.
+
+Key impacts of radioactive activity on health include:
+• Acute Radiation Sickness (ARS): High-dose radiation exposure causes immediate tissue damage, severe nausea, internal hemorrhaging, hair loss, and bone marrow failure.
+• Chronic Effects & Cancer: Low-dose long-term exposure or ingestion of radionuclides (such as Radium, Iodine-131, and Strontium-90) induces DNA mutations, leading to leukemia, thyroid cancer, and genetic birth defects in future generations.
+
+While controlled natural background radiation and medical radiation (X-rays) are manageable, uncontrolled radioactive waste or nuclear fallouts pose catastrophic, irreversible risks to human health.`
+      },
+      {
+        id: 7,
+        question: 'Write info on Environmental Ethics ( about rights )',
+        answer: `Environmental ethics is a branch of environmental philosophy that considers the moral obligations of human beings toward the natural environment and non-human entities. Unlike traditional anthropocentric (human-centered) ethics, which views nature solely as a resource for human consumption, environmental ethics advocates for biocentrism and ecocentrism. It asserts that all living organisms—including plants, animals, forests, and entire ecosystems—possess intrinsic value and inherent rights to exist and thrive, independent of their economic utility to humans.
+
+Key concepts regarding rights in environmental ethics include:
+1. Rights of Nature: Granting legal and moral rights to natural entities such as rivers, forests, and wild species to be protected from destruction.
+2. Intergenerational Equity: Recognizing the right of future human generations to inherit a healthy, biodiverse, and unpolluted planet.
+3. Animal Rights & Earth Stewardship: Extending moral consideration to animals, rejecting animal cruelty, and placing a moral duty on humans to act as responsible stewards rather than dominators of Earth's biosphere.`
+      },
+      {
+        id: 8,
+        question: 'Short note on Right to live',
+        answer: `The "Right to Live" is a fundamental human right enshrined in Article 21 of the Constitution of India, which guarantees that "No person shall be deprived of his life or personal liberty except according to procedure established by law." Through progressive judicial interpretation, the Supreme Court of India has significantly expanded the scope of Article 21 to mean more than mere animal existence; it encompasses living a life with human dignity, safety, and health.
+
+In landmark environmental judgments (such as Subhash Kumar v. State of Bihar, 1991), the judiciary explicitly recognized that the Right to Life includes the "Right to enjoy pollution-free water and air" and a healthy, ecologically balanced environment. Without clean air to breathe, safe drinking water, and uncontaminated food, human life cannot be sustained with dignity.
+
+Consequently, the Right to Live imposes a legal and moral obligation on the state to control environmental pollution, enforce strict ecological laws, and safeguard citizens from industrial hazards and ecological degradation.`
+      },
+      {
+        id: 9,
+        question: 'Short on Human rights & environment',
+        answer: `Human rights and the environment are intrinsically linked; a clean, healthy, and sustainable environment is a fundamental prerequisite for the full enjoyment of basic human rights. Basic human rights—such as the right to life, health, food, safe drinking water, adequate housing, and culture—cannot be realized in a degraded or polluted environment. Conversely, environmental degradation, climate change, deforestation, and industrial pollution directly violate human rights by displacing communities, causing fatal illnesses, and destroying livelihoods.
+
+In 2021, the United Nations Human Rights Council formally recognized access to a clean, healthy, and sustainable environment as a universal human right. This framework emphasizes environmental justice, asserting that vulnerable populations and indigenous communities should not bear a disproportionate burden of environmental harm caused by industrial activities.
+
+Protecting the environment is therefore essential for enforcing human rights, requiring transparent environmental decision-making, access to ecological information, public participation, and legal accountability for environmental violations.`
+      },
+      {
+        id: 10,
+        question: 'What is the importance of value education in your life?',
+        answer: `Value education is the process of imparting moral values, ethical principles, empathy, and social responsibility to individuals, serving as the foundation for personal character and conscious citizenship. In modern society, where technological progress often outpaces ethical responsibility, value education plays a vital role in guiding human choices toward harmony, environmental stewardship, and social justice.
+
+Key benefits of value education in personal life include:
+1. Moral & Character Development: Fosters integrity, honesty, self-discipline, and respect for diversity, helping individuals make ethical decisions when facing complex life challenges.
+2. Environmental Consciousness: Instills a deep respect for nature, encouraging eco-friendly habits such as resource conservation, waste reduction, and sustainable living rather than mindless consumerism.
+3. Social Empathy & Harmony: Promotes compassion, peaceful conflict resolution, and civic responsibility, strengthening relationships within families and communities.
+
+By integrating ethical values with academic knowledge, value education shapes individuals into responsible, empathetic, and environmentally conscious global citizens committed to building a sustainable and equitable world.`
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Assignment 3 – Sustainable Development',
+    subtitle: 'Chapter 3: Sustainable Development Balances, SDGs & Organic Farming (~150 words each)',
+    questions: [
+      {
+        id: 1,
+        question: 'Define sustainable development and explain its aim with respect to balancing economic, environmental, and social needs.',
+        answer: `Sustainable development is defined as "the development that fulfils the needs of the present without compromising the ability of future generations to meet their own needs." It recognizes that human progress must not come at the cost of depleting natural resources or damaging ecosystems that future generations will depend upon.
+
+The aim is to strike a balance between three pillars: economic growth, environmental protection, and social equity. Economically, it seeks true growth reflected in equitable distribution of benefits, bridging the gap between rich and poor. Environmentally, it emphasizes conserving natural resources like forests, water, and soil so ecological processes continue smoothly, since the environment acts as both a source of raw materials and a sink for waste. Socially, it ensures basic needs like food, health, and education are met for all. Sustainable development thus integrates growth with responsibility toward nature and future generations.`
+      },
+      {
+        id: 2,
+        question: 'List any five Sustainable Development Goals (SDGs) and briefly explain what each aims to achieve.',
+        answer: `The 17 SDGs were set by the UN General Assembly in 2015, to be achieved by 2030, as a blueprint for a better and sustainable future. Five examples are:
+
+• Goal 1 (No Poverty) – aims to end poverty in all forms everywhere.
+• Goal 3 (Good Health) – ensures healthy lives and promotes well-being for all ages.
+• Goal 6 (Clean Water and Sanitation) – ensures availability and sustainable management of water and sanitation for all.
+• Goal 7 (Renewable Energy) – ensures access to affordable, reliable, and modern energy for all.
+• Goal 13 (Climate Action) – calls for urgent action to combat climate change and its impacts.
+
+Together, these goals address interconnected global challenges—poverty, hunger, health, education, gender equality, water, energy, economic growth, industry, inequality, sustainable cities, responsible consumption, climate, life below water and on land, peace, and global partnerships—forming a comprehensive framework for sustainable global development.`
+      },
+      {
+        id: 3,
+        question: 'What are the major challenges faced in achieving sustainable development? Explain any three in detail.',
+        answer: `Several challenges hinder sustainable development.
+
+Population growth puts continuous pressure on limited natural resources, as the world's population (over 7.7 billion) exploits resources faster than they can regenerate.
+
+Exploitation of natural resources such as timber, coal, minerals, oil, and water has increased since industrialization, driven by new technologies and changing lifestyles, leading to depletion.
+
+Unequal distribution of resources is another major issue—developed countries like the USA, with only 4% of world population, consume about 25% of global resources, while developing nations struggle with basic needs.
+
+Additional challenges include poverty, consumerism (increased purchasing power leading to excessive consumption), illiteracy and unemployment, lack of public awareness about resource limits, and weak government policy implementation. Addressing these requires coordinated efforts—responsible consumption, equitable resource sharing, strong environmental policies, and public education—to ensure development does not compromise ecological balance or future generations' needs.`
+      },
+      {
+        id: 4,
+        question: 'Explain the concept of organic farming. Describe any three elements of sustainable agriculture (e.g., mixed cropping, crop rotation, bio-fertilizers).',
+        answer: `Organic farming is a farming system that avoids chemical fertilizers, pesticides, and synthetic feed additives, relying instead on natural and traditional methods combined with modern knowledge. It is based on the principle that nature is the best model for farming and that soil is a living system that should not be used for dumping chemicals.
+
+Three key elements of sustainable agriculture are:
+• Mixed cropping – growing different crops together in the same field so they benefit each other, e.g., planting Tur between cotton rows to fix atmospheric nitrogen, reducing pest risk and improving soil fertility.
+• Crop rotation – growing different crops sequentially in the same space to maintain nutrient balance, improve soil structure, and inhibit pest growth.
+• Bio-fertilizers – living organisms like Rhizobium and Azotobacter that enrich soil nutrients naturally, improving soil texture without causing pollution, making farming eco-friendly and cost-effective.`
+      },
+      {
+        id: 5,
+        question: 'Describe the role of individuals, community, and government in promoting sustainable development, giving one example of each.',
+        answer: `At the individual level, people can practice sustainable development by carefully using resources like food, water, energy, and paper, following the '4R' principle—Reduce, Reuse, Recycle, Recover—in daily life, such as reducing plastic use and conserving water and electricity.
+
+At the community level, collective action inspired by leadership can transform an entire village; Ralegan Siddhi, led by Anna Hazare, is a promising example where community participation in watershed management, tree plantation, and water conservation led to prosperity and sustainability.
+
+At the government level, policies and schemes drive large-scale change; for example, Swachh Bharat Abhiyan, launched in 2014, aims to provide sanitation facilities, build toilets, and establish waste disposal systems nationwide, addressing SDG Goal 6. Together, these three levels—individual responsibility, community cooperation, and government policy—create a multi-tiered approach essential for achieving genuine and lasting sustainable development.`
+      }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Assignment 4 – Practices for Environmental Protection',
+    subtitle: 'Chapter 4: Eco-Labelling, EIA, Green Audit & International Conventions (~150 words each)',
+    questions: [
+      {
+        id: 1,
+        question: 'What is consumer education? Explain its need and importance with reference to the Consumer Protection Act, 1986.',
+        answer: `Consumer education is defined as imparting knowledge to a consumer regarding cost effectiveness, budgeting ability, and developing awareness of purchase. With rising consumerism and purchasing power, substandard and even harmful products are increasingly sold at high prices, making consumer education essential. It provides skills to select the right goods from a huge range, helps consumers assess the market, reduces cheating on quantity and quality, promotes ethical values, and encourages sustainable consumption of eco-friendly products.
+
+The Consumer Protection Act, 1986, passed by the Indian Parliament, legally safeguards these interests by granting consumers several rights: protection from hazardous goods and services, the right to be informed about quantity and performance of goods, right to free choice at competitive prices, right to be heard in decisions affecting consumer interest, right to redressal if rights are violated, and the right to consumer education itself.`
+      },
+      {
+        id: 2,
+        question: 'What is eco-labelling? Explain the criteria and importance of the ECO Mark scheme in India.',
+        answer: `Eco-labelling is the use of labels on products to indicate how environment-friendly they are, helping consumers make informed purchasing decisions and encouraging sustainable consumption.
+
+The ECO Mark scheme, launched by the Government of India in 1991, certifies products that are made, used, and disposed of in a manner that significantly reduces environmental harm—following a "cradle-to-grave" approach covering raw material sourcing, energy-efficient production, waste management, and biodegradability. Requirements for ECO Mark include meeting Bureau of Indian Standards (BIS) norms, displaying critical ingredients in descending order of quantity, showing eco-friendly labelling criteria on packaging, and using reusable/recyclable/biodegradable packaging material.
+
+It has been notified for 16 product categories including soaps, detergents, paper, food items, paints, batteries, and cosmetics. The scheme's logo, an earthen pot, symbolizes sustainability since it uses renewable resources, produces no hazardous waste, and consumes minimal energy—promoting consumer awareness and industry accountability.`
+      },
+      {
+        id: 3,
+        question: 'Explain the concept and objectives of Environmental Impact Assessment (EIA). Describe the categories of projects under the EIA notification.',
+        answer: `Environmental Impact Assessment (EIA) is a systematic process to identify, predict, and evaluate the environmental effects of a proposed project before it is implemented. Its objectives include identifying economic, environmental, and social impacts of development; providing information for decision-making; identifying alternatives and mitigation measures; promoting resource conservation and waste minimization; and ultimately promoting sustainable development.
+
+In India, EIA has been mandatory since 1994, and under the 2006 notification, it applies to 40 specified activities across sectors like industry, mining, irrigation, power, and transport, managed by the Ministry of Environment, Forest and Climate Change (MoEF&CC).
+
+Projects are classified into two categories:
+• Category A: large projects such as ports, highways, and urban transport with greater environmental impact, cleared by the central government's Expert Appraisal Committee (EAC).
+• Category B: smaller projects with lesser impact, assessed at the state level by the State Expert Appraisal Committee (SEAC).`
+      },
+      {
+        id: 4,
+        question: 'What is Green Audit? Explain its components (waste audit, water audit, energy audit, ecological audit) and their significance.',
+        answer: `Green Audit is a systematic process of identifying, quantifying, recording, and analyzing an organization's use of resources like energy, water, built-up space, and air quality, aiming to upgrade environmental conditions and reduce risks to human health. It has four key components:
+
+• Waste audit – determines the type and volume of waste generated, guiding recycling, composting, and reduction strategies to achieve a 'zero waste' campus.
+• Water audit – evaluates water intake, wastewater treatment, and harvesting facilities to balance demand and supply.
+• Energy audit – examines energy consumption patterns to identify wastage and suggest conservation techniques, helping combat global warming.
+• Ecological audit – assesses land use, green cover percentage, and biodiversity, checking pesticide use and eco-friendly initiatives.
+
+Together, these audits help organizations frame better environmental performance, prepare resource inventories, implement conservation measures, and demonstrate environmental responsibility through continuous feedback and improvement.`
+      },
+      {
+        id: 5,
+        question: 'Discuss any two international conventions/agreements related to environmental protection (e.g., Ramsar Convention, Stockholm Conference, Rio Earth Summit) and India\'s role in them.',
+        answer: `The Ramsar Convention (1971) is an intergovernmental treaty for conservation and wise use of wetlands, addressing not only preservation but sustainable use. India joined in 1982 and now has numerous Ramsar sites of international importance, selected based on criteria like supporting endangered species or large populations of water birds.
+
+The Stockholm Conference (1972) was the first major international conference on environmental problems, producing the "Framework for Environmental Action" with 109 recommendations. India, as a signatory, played an important role—Prime Minister Indira Gandhi highlighted the link between poverty and environment.
+
+Following this, India added Articles 48A and 51A(g) to the Constitution through the 42nd Amendment, making environmental protection a state obligation and citizen's duty, and later enacted the Water Act (1974), Air Act (1981), and Environment Protection Act (1986), establishing a strong legal framework for environmental governance.`
+      }
+    ]
+  },
+  {
+    id: 5,
+    title: 'Assignment 5 – Water Security',
+    subtitle: 'Chapter 5: Water Resources, Scarcity, Pollution & National Water Policy (~150 words each)',
+    questions: [
+      {
+        id: 1,
+        question: 'Explain the sources of water resources in India (surface water and groundwater) and the factors affecting groundwater availability.',
+        answer: `India's water resources are broadly classified into surface water and groundwater.
+
+Surface water sources include rivers, lakes, ponds, and tanks, with rivers being the most important; Ganga and Brahmaputra have the largest catchment areas. However, due to topographical and hydrological constraints, only about 32% of available surface water can actually be utilized, and rainfall is highly uneven, concentrated mainly in the monsoon season.
+
+Groundwater is rainwater that percolates into the ground and represents a crucial water source in India. Its availability depends on topography, subsurface geology, and prevailing climate. Groundwater utilization is very high in states like Punjab, Haryana, Rajasthan, and Tamil Nadu, while states like Chhattisgarh, Odisha, and Kerala use only a small proportion of their potential. The Central Ground Water Authority (CGWA) regulates industrial groundwater usage to prevent over-exploitation and ensure sustainable management of this vital resource.`
+      },
+      {
+        id: 2,
+        question: 'What is water scarcity? Discuss the causes of water scarcity in India with suitable examples.',
+        answer: `Water scarcity refers to the shortage or inadequate availability of usable water to meet demand. Despite India receiving nearly 4% of global precipitation, it faces acute water scarcity due to several causes.
+
+Rainfall is highly uneven—Konkan receives over 300 cm annually while eastern Maharashtra districts like Sangli, Solapur, and Marathwada receive only about 50 cm, causing regional imbalance. Over-exploitation and excessive use of groundwater, particularly for irrigation and industry, deplete resources faster than they can recharge. Rapid industrialization and urbanization increase pressure on existing water sources, while pollution from domestic and industrial waste renders large quantities of water unfit for use, effectively reducing usable supply.
+
+Additionally, poor water management, wastage, and lack of conservation practices worsen the crisis. By 2025, over 50 countries including India are predicted to face severe water scarcity, making conservation and efficient management urgent priorities.`
+      },
+      {
+        id: 3,
+        question: 'Explain the major sources of water pollution and their harmful effects on human health and aquatic ecosystems.',
+        answer: `Water pollution arises from four major sources.
+
+Domestic waste (sewage) includes human and animal excreta, detergents, and food waste that accumulate in water bodies, causing eutrophication, foul odor, and spreading diseases like cholera and typhoid.
+
+Industrial waste from textile, chemical, and leather industries releases heavy metals and toxic compounds like phenol and cyanide, which are non-degradable and carcinogenic.
+
+Agricultural waste, including excess fertilizers and pesticides, leaches into groundwater and surface water through runoff, harming aquatic life and human health.
+
+Thermal pollution, from power plants discharging heated water, reduces dissolved oxygen and disrupts aquatic ecosystems, even affecting sex determination in species like sea turtles. Collectively, these pollutants cause eutrophication, oxygen depletion, fish kills, bioaccumulation of toxins in the food chain, and serious human diseases.`
+      },
+      {
+        id: 4,
+        question: 'Describe any three traditional and modern water conservation and watershed management techniques (e.g., check dams, contour trenches, rainwater harvesting).',
+        answer: `Water conservation combines traditional wisdom with modern engineering.
+
+Check dams are small dams built across waterways using stone, sandbags, or branches to reduce water flow velocity and increase groundwater percolation.
+
+Contour trenches are dug along hillsides following contour lines, perpendicular to water flow, to capture and hold rainfall, preventing runoff and soil erosion.
+
+Rainwater harvesting involves collecting rooftop rainwater and channeling it into percolation chambers to recharge groundwater; for example, a 100 sq. m terrace in Pune with 760 mm average rainfall can harvest about 76,000 liters annually.
+
+Other techniques include traditional systems like Johads (earthen dams) in Rajasthan and Kunds (underground tanks), alongside modern methods like gabion structures and farm ponds. Together, these methods conserve water, recharge aquifers, and support sustainable agriculture and drinking water supply.`
+      },
+      {
+        id: 5,
+        question: 'Explain the highlights of India\'s National Water Policy, 2002, and its importance in water conservation.',
+        answer: `India's National Water Policy, 2002, aims to provide surplus water to deficit areas while reducing pollution and improving river water quality.
+
+Key highlights include mandating that irrigation and multipurpose projects include a drinking water component wherever no alternative source exists, ensuring drinking water availability for all humans and animals, and regulating groundwater exploitation to prevent over-extraction. The policy emphasizes regular monitoring of both surface and groundwater quality, with dedicated programs for improving water quality where needed.
+
+It also calls for improving efficiency in all water uses—agricultural, domestic, and industrial—and fostering awareness that water is a scarce resource requiring conservation consciousness from an early educational stage, supported by regulations, incentives, and disincentives. This policy provides a national framework guiding states toward sustainable water management and long-term water security.`
+      }
+    ]
   }
 ];
 
 export const BOARD_ASSIGNMENTS: BoardAssignmentDivision[] = [
   {
     division: 'Division A',
-    description: 'HSC Board Assignment topics & answers covering Chapters 1–5.',
+    description: 'Journal Questions covering Chapters 1–5.',
     questions: [
       {
         id: 1,
@@ -237,7 +519,7 @@ Modern Techniques:
   },
   {
     division: 'Division B',
-    description: 'HSC Board Assignment topics & answers covering Chapters 1–5.',
+    description: 'Journal Questions covering Chapters 1–5.',
     questions: [
       {
         id: 1,
@@ -317,7 +599,7 @@ Effects of Water Pollution:
   },
   {
     division: 'Division C',
-    description: 'HSC Board Assignment topics & answers covering Chapters 1–5.',
+    description: 'Journal Questions covering Chapters 1–5.',
     questions: [
       {
         id: 1,
@@ -400,7 +682,7 @@ Water Conflicts:
   },
   {
     division: 'Division D',
-    description: 'HSC Board Assignment topics & answers covering Chapters 1–5.',
+    description: 'Journal Questions covering Chapters 1–5.',
     questions: [
       {
         id: 1,
@@ -480,7 +762,7 @@ Importance of Water Resources:
   },
   {
     division: 'Division E',
-    description: 'HSC Board Assignment topics & answers covering Chapters 1–5.',
+    description: 'Journal Questions covering Chapters 1–5.',
     questions: [
       {
         id: 1,
@@ -553,7 +835,7 @@ Key Watershed Management Structures:
   },
   {
     division: 'Division E-Arts',
-    description: 'HSC Board Assignment topics & answers covering Chapters 1–5.',
+    description: 'Journal Questions covering Chapters 1–5.',
     questions: [
       {
         id: 1,

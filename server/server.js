@@ -17,6 +17,14 @@ app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
+
 // Setup Multer for file uploads
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -76,7 +84,7 @@ app.post('/api/register', async (req, res) => {
   console.log(`[${new Date().toISOString()}] REGISTER REQUEST from IP: ${req.ip}`);
   if (!supabase) return res.status(500).json({ error: 'Database not initialized.' });
 
-  const { division, rollNumber, name, topic, isGroup, member2RollNumber, member2Name } = req.body;
+  const { division, rollNumber, name, topic, projectTopic, isGroup, member2RollNumber, member2Name, member2ProjectTopic } = req.body;
 
   if (!division || !rollNumber || !name || !topic) {
     return res.status(400).json({ error: 'All fields are required.' });
@@ -89,7 +97,9 @@ app.post('/api/register', async (req, res) => {
   // Normalize inputs
   const normalizedName = name.trim();
   const normalizedTopic = topic.trim();
+  const normalizedProjectTopic = projectTopic ? projectTopic.trim() : null;
   const normMem2Name = isGroup ? member2Name.trim() : null;
+  const normalizedMem2ProjectTopic = (isGroup && member2ProjectTopic) ? member2ProjectTopic.trim() : null;
 
   try {
     const { data, error } = await supabase
@@ -100,8 +110,10 @@ app.post('/api/register', async (req, res) => {
           roll_number: parseInt(rollNumber), 
           name: normalizedName, 
           topic: normalizedTopic,
+          project_topic: normalizedProjectTopic,
           member2_roll_number: isGroup ? parseInt(member2RollNumber) : null,
-          member2_name: normMem2Name
+          member2_name: normMem2Name,
+          member2_project_topic: normalizedMem2ProjectTopic
         }
       ]);
 
@@ -116,6 +128,45 @@ app.post('/api/register', async (req, res) => {
   } catch (error) {
     console.error('Registration Error:', error);
     res.status(500).json({ error: 'Internal server error.' });
+  }
+});
+
+/**
+ * CHECK ROLL NUMBER AVAILABILITY
+ */
+app.all('/api/check-roll', async (req, res) => {
+  if (!supabase) return res.status(500).json({ error: 'Database not initialized.' });
+  const rollNumber = req.query?.rollNumber || req.body?.rollNumber;
+
+  if (!rollNumber) {
+    return res.status(400).json({ error: 'Roll Number is required.' });
+  }
+
+  const parsedRoll = parseInt(String(rollNumber).trim());
+  if (isNaN(parsedRoll) || parsedRoll < 2000 || parsedRoll > 3000) {
+    return res.status(400).json({ error: 'Roll number must be between 2000 and 3000.' });
+  }
+
+  try {
+    const { data: existing, error } = await supabase
+      .from('registrations')
+      .select('id, name, division, roll_number, member2_name, member2_roll_number')
+      .or(`roll_number.eq.${parsedRoll},member2_roll_number.eq.${parsedRoll}`);
+
+    if (error) throw error;
+
+    const isTaken = existing && existing.length > 0;
+    const match = isTaken ? existing[0] : null;
+
+    return res.status(200).json({
+      available: !isTaken,
+      taken: isTaken,
+      division: match ? match.division : null,
+      studentName: match ? (match.roll_number === parsedRoll ? match.name : match.member2_name) : null
+    });
+  } catch (err) {
+    console.error('Check Roll error:', err);
+    res.status(500).json({ error: 'Failed to check roll number.' });
   }
 });
 
@@ -274,19 +325,25 @@ app.post('/api/upload', upload.single('presentation'), async (req, res) => {
 // ---------------------------------------------------------
 // ADMIN ROUTES
 // ---------------------------------------------------------
-const ADMIN_PIN = '1092';
+const ADMIN_PIN = process.env.ADMIN_PIN || '1092';
+
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 failed/attempt calls
+  message: { error: 'Too many admin PIN attempts. Please wait 15 minutes.' }
+});
 
 const requireAdmin = (req, res, next) => {
   const pin = req.headers['x-admin-pin'];
-  if (!pin || pin !== ADMIN_PIN) {
+  if (!pin || String(pin).trim() !== ADMIN_PIN.trim()) {
     return res.status(401).json({ error: 'Unauthorized. Invalid PIN.' });
   }
   next();
 };
 
-app.post('/api/admin/verify-pin', (req, res) => {
-  const { pin } = req.body;
-  if (pin === ADMIN_PIN) {
+app.post('/api/admin/verify-pin', adminLimiter, (req, res) => {
+  const { pin } = req.body || {};
+  if (pin && String(pin).trim() === ADMIN_PIN.trim()) {
     res.status(200).json({ success: true });
   } else {
     res.status(401).json({ error: 'Invalid PIN' });

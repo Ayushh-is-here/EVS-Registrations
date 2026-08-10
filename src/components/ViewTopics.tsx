@@ -7,6 +7,8 @@ interface TopicData {
   id: number;
   division: string;
   topic: string;
+  project_topic?: string | null;
+  member2_project_topic?: string | null;
   has_uploaded: boolean;
 }
 
@@ -126,9 +128,31 @@ const ViewTopics = () => {
                           </div>
                         )}
                       </div>
-                      <h3 className="text-lg font-medium text-ink leading-tight flex-grow">
-                        {topic.topic}
-                      </h3>
+                      <div className="flex-grow space-y-2">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-ink-light tracking-wider block mb-0.5">Seminar Presentation</span>
+                          <h3 className="text-base font-semibold text-ink leading-tight">
+                            {topic.topic}
+                          </h3>
+                        </div>
+
+                        {(topic.project_topic || topic.member2_project_topic) && (
+                          <div className="pt-2 border-t border-border/40 text-xs text-ink-light space-y-1">
+                            <span className="text-[10px] uppercase font-bold text-accent/90 tracking-wider block mb-0.5">Blue Book Project(s)</span>
+                            {topic.project_topic && (
+                              <p className="text-ink/90 font-medium leading-snug">
+                                {topic.member2_project_topic ? <span className="text-ink-light font-normal">M1: </span> : null}
+                                {topic.project_topic}
+                              </p>
+                            )}
+                            {topic.member2_project_topic && (
+                              <p className="text-ink/90 font-medium leading-snug">
+                                <span className="text-ink-light font-normal">M2: </span>{topic.member2_project_topic}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </motion.div>

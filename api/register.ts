@@ -7,7 +7,7 @@ export default async function handler(req: any, res: any) {
 
   try {
     const supabase = getSupabase();
-    const { division, rollNumber, name, topic, isGroup, member2RollNumber, member2Name } = req.body || {};
+    const { division, rollNumber, name, topic, projectTopic, isGroup, member2RollNumber, member2Name, member2ProjectTopic } = req.body || {};
 
     if (!division || !rollNumber || !name || !topic) {
       return res.status(400).json({ error: 'All fields are required.' });
@@ -29,17 +29,36 @@ export default async function handler(req: any, res: any) {
       }
     }
 
+    // Global roll number check regardless of division
+    const roll2Val = isGroup && member2RollNumber ? parseInt(member2RollNumber) : null;
+    const orQuery = roll2Val
+      ? `roll_number.eq.${parsedRoll1},member2_roll_number.eq.${parsedRoll1},roll_number.eq.${roll2Val},member2_roll_number.eq.${roll2Val}`
+      : `roll_number.eq.${parsedRoll1},member2_roll_number.eq.${parsedRoll1}`;
+
+    const { data: existingRolls } = await supabase
+      .from('registrations')
+      .select('id, division, roll_number, member2_roll_number')
+      .or(orQuery);
+
+    if (existingRolls && existingRolls.length > 0) {
+      return res.status(409).json({ error: 'This Roll Number has already registered a topic in the system.' });
+    }
+
     const normalizedName = String(name).trim();
     const normalizedTopic = String(topic).trim();
+    const normalizedProjectTopic = projectTopic ? String(projectTopic).trim() : null;
     const normMem2Name = isGroup ? String(member2Name).trim() : null;
+    const normalizedMem2ProjectTopic = (isGroup && member2ProjectTopic) ? String(member2ProjectTopic).trim() : null;
 
     const record: Record<string, any> = {
       division,
       roll_number: parseInt(rollNumber),
       name: normalizedName,
       topic: normalizedTopic,
+      project_topic: normalizedProjectTopic,
       member2_roll_number: isGroup ? parseInt(member2RollNumber) : null,
       member2_name: normMem2Name,
+      member2_project_topic: normalizedMem2ProjectTopic,
       pin: '0000'
     };
 
@@ -47,8 +66,10 @@ export default async function handler(req: any, res: any) {
       .from('registrations')
       .insert([record]);
 
-    if (error && (error.code === '42703' || error.code === 'PGRST204' || (error.message && error.message.includes('pin')))) {
+    if (error && (error.code === '42703' || error.code === 'PGRST204' || (error.message && (error.message.includes('pin') || error.message.includes('project_topic') || error.message.includes('member2_project_topic'))))) {
       delete record.pin;
+      delete record.project_topic;
+      delete record.member2_project_topic;
       const retry = await supabase.from('registrations').insert([record]);
       error = retry.error;
     }

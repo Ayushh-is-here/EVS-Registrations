@@ -11,7 +11,10 @@ import {
   ChevronDown,
   History,
   X,
-  Trash
+  Trash,
+  Lock,
+  LogOut,
+  ShieldCheck
 } from 'lucide-react';
 import KineticHeading from './KineticHeading';
 
@@ -22,6 +25,8 @@ interface Registration {
   roll_number: number;
   name: string;
   topic: string;
+  project_topic?: string | null;
+  member2_project_topic?: string | null;
   has_uploaded: boolean;
   file_id: string | null;
   file_link: string | null;
@@ -41,6 +46,11 @@ const AdminPanel = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+
+  // Lockout & Failed attempts state
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState(0);
 
   // Deletion History state (persisted in localStorage)
   const [deletedHistory, setDeletedHistory] = useState<DeletedRegistration[]>(() => {
@@ -68,9 +78,62 @@ const AdminPanel = () => {
     }
   }, [deletedHistory]);
 
+  // Lockout countdown timer
+  useEffect(() => {
+    if (!lockoutUntil) return;
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const remaining = Math.max(0, Math.ceil((lockoutUntil - now) / 1000));
+      setCountdown(remaining);
+      if (remaining <= 0) {
+        setLockoutUntil(null);
+        setFailedAttempts(0);
+      }
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [lockoutUntil]);
+
+  // Inactivity Auto-Logout (15 Minutes)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const resetTimer = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        handleLogout();
+        alert('Admin session expired due to inactivity. Please re-enter your PIN to access.');
+      }, 15 * 60 * 1000); // 15 minutes
+    };
+
+    window.addEventListener('mousemove', resetTimer);
+    window.addEventListener('keydown', resetTimer);
+    window.addEventListener('scroll', resetTimer);
+    resetTimer();
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('mousemove', resetTimer);
+      window.removeEventListener('keydown', resetTimer);
+      window.removeEventListener('scroll', resetTimer);
+    };
+  }, [isAuthenticated]);
+
+  const [adminToken, setAdminToken] = useState<string | null>(null);
+
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    setPin('');
+    setAdminToken(null);
+    setRegistrations([]);
+    setError(null);
+  };
+
   // Authenticate PIN
   const handlePinSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (lockoutUntil && Date.now() < lockoutUntil) return;
+
     setError(null);
     setLoading(true);
     try {
@@ -79,11 +142,24 @@ const AdminPanel = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ pin })
       });
-      if (response.ok) {
+      const data = await response.json().catch(() => ({}));
+      if (response.ok && data.token) {
         setIsAuthenticated(true);
-        fetchRegistrations(pin);
+        setAdminToken(data.token);
+        setFailedAttempts(0);
+        setLockoutUntil(null);
+        fetchRegistrations(data.token, pin);
       } else {
-        setError('Incorrect PIN. Please try again.');
+        const nextAttempts = failedAttempts + 1;
+        setFailedAttempts(nextAttempts);
+        if (nextAttempts >= 5 || response.status === 429) {
+          const lockTime = Date.now() + 5 * 60 * 1000;
+          setLockoutUntil(lockTime);
+          setCountdown(300);
+          setError(data.error || 'Too many incorrect PIN attempts. Admin panel locked for 5 minutes.');
+        } else {
+          setError(data.error || `Incorrect PIN (${5 - nextAttempts} attempts remaining).`);
+        }
       }
     } catch (err) {
       setError('Failed to connect to server.');
@@ -92,10 +168,14 @@ const AdminPanel = () => {
     }
   };
 
-  const fetchRegistrations = async (currentPin: string) => {
+  const fetchRegistrations = async (token?: string | null, currentPin?: string) => {
+    const activeToken = token || adminToken;
     try {
       const response = await fetch('/api/admin/registrations', {
-        headers: { 'x-admin-pin': currentPin }
+        headers: { 
+          'Authorization': `Bearer ${activeToken || ''}`,
+          'x-admin-pin': currentPin || pin 
+        }
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || 'Failed to fetch registrations');
@@ -114,7 +194,10 @@ const AdminPanel = () => {
     try {
       const response = await fetch(`/api/admin/registrations/${id}`, {
         method: 'DELETE',
-        headers: { 'x-admin-pin': pin }
+        headers: { 
+          'Authorization': `Bearer ${adminToken || ''}`,
+          'x-admin-pin': pin 
+        }
       });
       if (response.ok) {
         const deletedRecord: DeletedRegistration = {
@@ -140,7 +223,7 @@ const AdminPanel = () => {
 
   const exportToExcel = () => {
     const headers = [
-      'ID', 'Date Submitted', 'Division', 'Format', 'Roll Number 1', 'Student Name 1', 'Roll Number 2', 'Student Name 2', 'Topic Title', 'Uploaded Status', 'File Link'
+      'ID', 'Date Submitted', 'Division', 'Format', 'Roll Number 1', 'Student Name 1', 'M1 Blue Book Topic', 'Roll Number 2', 'Student Name 2', 'M2 Blue Book Topic', 'Seminar Presentation Topic', 'Uploaded Status', 'File Link'
     ];
     
     const rows = filteredRegistrations.map(r => [
@@ -150,8 +233,10 @@ const AdminPanel = () => {
       r.member2_name ? 'Group' : 'Individual',
       r.roll_number,
       `"${r.name}"`,
+      `"${r.project_topic || ''}"`,
       r.member2_roll_number || '',
       r.member2_name ? `"${r.member2_name}"` : '',
+      `"${r.member2_project_topic || ''}"`,
       `"${r.topic}"`,
       r.has_uploaded ? 'Uploaded' : 'Pending',
       r.file_link ? `"${r.file_link}"` : ''
@@ -314,17 +399,36 @@ const AdminPanel = () => {
               onChange={(e) => setPin(e.target.value)}
               maxLength={4}
               placeholder="••••"
-              className="editorial-input text-center text-2xl tracking-[0.5em] mb-4 font-mono"
+              disabled={loading || Boolean(lockoutUntil && countdown > 0)}
+              className="editorial-input text-center text-2xl tracking-[0.5em] mb-4 font-mono disabled:opacity-50"
               autoFocus
             />
-            {error && <p className="text-error text-sm mb-4">{error}</p>}
-            <button type="submit" className="editorial-button-primary" disabled={loading || pin.length !== 4}>
+
+            {lockoutUntil && countdown > 0 ? (
+              <div className="p-3 mb-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs font-semibold flex items-center justify-center gap-2">
+                <Lock className="w-4 h-4" />
+                <span>Locked for security. Try again in {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, '0')}</span>
+              </div>
+            ) : error ? (
+              <p className="text-error text-xs font-medium mb-4">{error}</p>
+            ) : null}
+
+            <button 
+              type="submit" 
+              className="editorial-button-primary w-full py-3" 
+              disabled={loading || pin.length !== 4 || Boolean(lockoutUntil && countdown > 0)}
+            >
               {loading ? (
                 <span className="flex items-center justify-center gap-2">
                   <RefreshCw className="animate-spin h-5 w-5 text-white" />
                   Verifying...
                 </span>
-              ) : 'Access Dashboard'}
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  <Lock className="w-4 h-4" />
+                  Access Dashboard
+                </span>
+              )}
             </button>
           </form>
         </div>
@@ -343,8 +447,14 @@ const AdminPanel = () => {
          --------------------------------------------------------- */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <KineticHeading text="Admin Dashboard" className="text-3xl sm:text-4xl font-heading font-semibold text-ink" glowSweep />
-          <p className="text-ink-light text-xs sm:text-sm font-medium mt-1">
+          <div className="flex items-center gap-2 mb-1">
+            <KineticHeading text="Admin Dashboard" className="text-3xl sm:text-4xl font-heading font-semibold text-ink" glowSweep />
+            <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+              <ShieldCheck className="w-3.5 h-3.5" />
+              Secured Session
+            </span>
+          </div>
+          <p className="text-ink-light text-xs sm:text-sm font-medium">
             Grade 12 · Environmental Studies · All Registrations
           </p>
         </div>
@@ -371,6 +481,16 @@ const AdminPanel = () => {
           >
             <Download className="w-4 h-4" />
             <span>Export Excel</span>
+          </button>
+
+          {/* Logout & Lock Panel Button */}
+          <button 
+            onClick={handleLogout}
+            title="Lock Admin Panel & End Session"
+            className="editorial-button-secondary !w-auto !mt-0 !py-2.5 !px-3.5 flex items-center gap-1.5 text-xs font-semibold text-red-600 dark:text-red-400 border border-red-500/20 hover:bg-red-500/10 transition-colors"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Lock Panel</span>
           </button>
         </div>
       </div>
@@ -641,6 +761,16 @@ const AdminPanel = () => {
                           <p className="font-semibold text-ink leading-snug">
                             {reg.topic}
                           </p>
+                          {reg.project_topic && (
+                            <p className="text-[11px] text-accent font-medium mt-0.5">
+                              {reg.member2_name ? 'M1 Blue Book: ' : 'Blue Book: '}{reg.project_topic}
+                            </p>
+                          )}
+                          {reg.member2_project_topic && (
+                            <p className="text-[11px] text-purple-600 dark:text-purple-400 font-medium mt-0.5">
+                              M2 Blue Book: {reg.member2_project_topic}
+                            </p>
+                          )}
                           <p className="text-[11px] text-ink-light mt-0.5">
                             {reg.name}
                             {reg.member2_name && ` & ${reg.member2_name}`}

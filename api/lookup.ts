@@ -22,7 +22,7 @@ export default async function handler(req: any, res: any) {
 
     const { data: students, error: fetchError } = await supabase
       .from('registrations')
-      .select('id, name, topic, has_uploaded, member2_name')
+      .select('id, name, topic, project_topic, member2_name, member2_project_topic, has_uploaded')
       .eq('division', division)
       .or(`and(roll_number.eq.${parsedRollNumber},name.ilike.%${normalizedName}%),and(member2_roll_number.eq.${parsedRollNumber},member2_name.ilike.%${normalizedName}%)`);
 
@@ -33,12 +33,16 @@ export default async function handler(req: any, res: any) {
     }
 
     const student = students[0];
+    const isMember2Match = Boolean(student.member2_name && student.member2_name.toLowerCase().includes(normalizedName.toLowerCase()));
+    const resolvedProjectTopic = isMember2Match ? (student.member2_project_topic || student.project_topic) : student.project_topic;
+    const resolvedName = isMember2Match ? student.member2_name : student.name;
 
     return res.status(200).json({
       student: {
         id: student.id,
-        name: student.name,
+        name: resolvedName,
         topic_title: student.topic,
+        project_topic: resolvedProjectTopic,
         has_uploaded: student.has_uploaded,
       }
     });

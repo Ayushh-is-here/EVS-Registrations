@@ -8,6 +8,7 @@ interface StudentDetails {
   id: string;
   name: string;
   topic_title: string;
+  project_topic?: string | null;
   has_uploaded: boolean;
 }
 
@@ -95,7 +96,8 @@ Please find attached my Environmental Studies (EVS) presentation file.
 Division: Division ${lookupData.division}
 Roll Number: ${lookupData.rollNumber}
 Student Name: ${studentDetails.name}
-Topic Title: ${studentDetails.topic_title}
+Seminar Topic: ${studentDetails.topic_title}
+Project Topic (Blue Book): ${studentDetails.project_topic || 'N/A'}
 
 (Attached File: My Presentation .pptx / .pdf)
 
@@ -234,9 +236,12 @@ ${studentDetails.name}`
               <p className="text-ink-light text-xs mb-2">
                 Division {lookupData.division} • Roll No. {lookupData.rollNumber}
               </p>
-              <p className="text-ink-light text-xs border-t border-accent/20 pt-2 font-medium">
-                Topic: <span className="text-accent">{studentDetails?.topic_title}</span>
-              </p>
+              <div className="text-ink-light text-xs border-t border-accent/20 pt-2 space-y-1 font-medium">
+                <p>Seminar Topic: <span className="text-accent">{studentDetails?.topic_title}</span></p>
+                {studentDetails?.project_topic && (
+                  <p>Blue Book Project: <span className="text-accent">{studentDetails?.project_topic}</span></p>
+                )}
+              </div>
             </div>
 
             {/* Email Instructions Card */}

@@ -37,7 +37,7 @@ const Assignments = () => {
   };
 
   const handleCopyAllBoard = (division: BoardAssignmentDivision) => {
-    const text = `${division.division} HSC Board Assignment Q&As:\n\n` + 
+    const text = `${division.division} Journal Questions Q&As:\n\n` + 
       division.questions.map((q) => `Q${q.id}) ${q.question}\n\nAnswer:\n${q.answer}\n`).join('\n----------------------------------------\n\n');
     navigator.clipboard.writeText(text);
     setCopiedId(`all-board-${division.division}`);
@@ -58,11 +58,11 @@ const Assignments = () => {
       <div className="text-center space-y-3 sm:space-y-4">
         <KineticHeading as="h1" text="Assignments" className="text-3xl sm:text-4xl text-ink font-heading font-bold" glowSweep />
         <p className="text-xs sm:text-sm text-ink-light max-w-lg mx-auto px-2 font-body">
-          Access your EVS course assignments, model answers, and board presentation topics.
+          Access your EVS course assignments, model answers, and journal questions.
         </p>
       </div>
 
-      {/* Main Tabs: Internal vs Board */}
+      {/* Main Tabs: Internal vs Board/Journal */}
       <div className="flex p-1 bg-surface/50 border border-border rounded-xl mx-auto w-full max-w-md backdrop-blur-md" role="tablist" aria-label="Assignment type navigation">
         <button
           role="tab"
@@ -88,7 +88,7 @@ const Assignments = () => {
           }`}
         >
           <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
-          <span>HSC Board Assignments</span>
+          <span>Journal Questions</span>
         </button>
       </div>
 
@@ -320,11 +320,11 @@ const Assignments = () => {
                 <h2 className="text-base sm:text-lg font-heading font-semibold">Select Your Division</h2>
               </div>
               <p className="text-xs sm:text-sm text-ink-light font-body">
-                Choose your division below to access your assigned 5 presentation questions and ~200-word model answers.
+                Choose your division below to access your assigned journal questions and model answers.
               </p>
 
               {/* Division Selector Pills */}
-              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-2.5 pt-1" role="group" aria-label="HSC Division selection">
+              <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-6 gap-2 sm:gap-2.5 pt-1" role="group" aria-label="Division selection">
                 {BOARD_ASSIGNMENTS.map((div) => {
                   const isSelected = div.division === selectedDivisionName;
                   return (
@@ -333,13 +333,12 @@ const Assignments = () => {
                       onClick={() => setSelectedDivisionName(div.division)}
                       aria-pressed={isSelected}
                       aria-label={`Select ${div.division}`}
-                      className={`py-2 sm:py-3 px-2 sm:px-3 rounded-xl font-medium text-xs sm:text-sm flex flex-col items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
+                      className={`py-2.5 sm:py-3 px-2 sm:px-3 rounded-xl font-medium text-xs sm:text-sm flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
                         isSelected
                           ? 'bg-accent text-white shadow-glow border border-accent/50 scale-[1.02]'
                           : 'bg-surface/70 border border-border text-ink hover:border-accent/40 hover:bg-surface'
                       }`}
                     >
-                      <span className="text-[10px] sm:text-xs opacity-80 uppercase tracking-wider">HSC</span>
                       <span className="font-semibold">{div.division}</span>
                     </button>
                   );
@@ -366,7 +365,7 @@ const Assignments = () => {
                     </h2>
                   </div>
                   <p className="text-xs text-ink-light mt-1 font-body">
-                    5 Presentation Questions & ~200-Word Model Answers
+                    5 Journal Questions & ~200-Word Model Answers
                   </p>
                 </div>
 
