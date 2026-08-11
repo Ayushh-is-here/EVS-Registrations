@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Search, 
@@ -14,43 +15,58 @@ import {
   Trash,
   Lock,
   LogOut,
-  ShieldCheck
+  ShieldCheck,
+  AlertTriangle,
+  AlertCircle
 } from 'lucide-react';
 import KineticHeading from './KineticHeading';
-
-interface Registration {
-  id: number;
-  created_at: string;
-  division: string;
-  roll_number: number;
-  name: string;
-  topic: string;
-  project_topic?: string | null;
-  member2_project_topic?: string | null;
-  has_uploaded: boolean;
-  file_id: string | null;
-  file_link: string | null;
-  member2_roll_number: number | null;
-  member2_name: string | null;
-}
+import { store, type Registration } from '../lib/store';
 
 interface DeletedRegistration extends Registration {
   deleted_at: string;
+}
+
+interface ConfirmModalState {
+  isOpen: boolean;
+  title: string;
+  itemDetails?: {
+    name: string;
+    division: string;
+    rollNumber: string;
+    topic: string;
+    member2Name?: string | null;
+    member2RollNumber?: string | null;
+  };
+  message?: string;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm: () => void | Promise<void>;
 }
 
 const ALL_DIVISIONS = ['A', 'B', 'C', 'D', 'E-Commerce', 'E-Arts'];
 
 const AdminPanel = () => {
   const [pin, setPin] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [adminToken, setAdminToken] = useState<string | null>(() => {
+    try {
+      return sessionStorage.getItem('evs_admin_token');
+    } catch {
+      return null;
+    }
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => Boolean(sessionStorage.getItem('evs_admin_token')));
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [registrations, setRegistrations] = useState<Registration[]>(() => store.getRegistrations());
 
   // Lockout & Failed attempts state
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [lockoutUntil, setLockoutUntil] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(0);
+
+  // Custom Confirmation Dialogue Modal state
+  const [confirmModal, setConfirmModal] = useState<ConfirmModalState | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Deletion History state (persisted in localStorage)
   const [deletedHistory, setDeletedHistory] = useState<DeletedRegistration[]>(() => {
@@ -93,6 +109,20 @@ const AdminPanel = () => {
     return () => clearInterval(interval);
   }, [lockoutUntil]);
 
+  // Sync registrations from central store once authenticated
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const unsubscribe = store.subscribe(() => {
+      setRegistrations(store.getRegistrations());
+    });
+
+    store.loadRegistrations(adminToken, pin).then(data => {
+      setRegistrations(data);
+    });
+
+    return () => unsubscribe();
+  }, [isAuthenticated, adminToken, pin]);
+
   // Inactivity Auto-Logout (15 Minutes)
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -102,7 +132,7 @@ const AdminPanel = () => {
       clearTimeout(timer);
       timer = setTimeout(() => {
         handleLogout();
-        alert('Admin session expired due to inactivity. Please re-enter your PIN to access.');
+        setError('Admin session expired due to inactivity. Please re-enter your PIN to access.');
       }, 15 * 60 * 1000); // 15 minutes
     };
 
@@ -119,12 +149,15 @@ const AdminPanel = () => {
     };
   }, [isAuthenticated]);
 
-  const [adminToken, setAdminToken] = useState<string | null>(null);
-
   const handleLogout = () => {
     setIsAuthenticated(false);
     setPin('');
     setAdminToken(null);
+    try {
+      sessionStorage.removeItem('evs_admin_token');
+    } catch {
+      // ignore
+    }
     setRegistrations([]);
     setError(null);
   };
@@ -146,9 +179,15 @@ const AdminPanel = () => {
       if (response.ok && data.token) {
         setIsAuthenticated(true);
         setAdminToken(data.token);
+        try {
+          sessionStorage.setItem('evs_admin_token', data.token);
+        } catch {
+          // ignore
+        }
         setFailedAttempts(0);
         setLockoutUntil(null);
-        fetchRegistrations(data.token, pin);
+        setLoading(false);
+        store.loadRegistrations(data.token, pin).then(regs => setRegistrations(regs));
       } else {
         const nextAttempts = failedAttempts + 1;
         setFailedAttempts(nextAttempts);
@@ -168,57 +207,60 @@ const AdminPanel = () => {
     }
   };
 
-  const fetchRegistrations = async (token?: string | null, currentPin?: string) => {
-    const activeToken = token || adminToken;
-    try {
-      const response = await fetch('/api/admin/registrations', {
-        headers: { 
-          'Authorization': `Bearer ${activeToken || ''}`,
-          'x-admin-pin': currentPin || pin 
-        }
-      });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Failed to fetch registrations');
-      setRegistrations(data.registrations || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDelete = async (id: number) => {
+  const handleDelete = (id: number) => {
     const itemToDelete = registrations.find(r => r.id === id);
     if (!itemToDelete) return;
 
-    if (!window.confirm(`Are you sure you want to delete registration for "${itemToDelete.name}" (${itemToDelete.topic})?`)) return;
-
-    try {
-      const response = await fetch(`/api/admin/registrations/${id}`, {
-        method: 'DELETE',
-        headers: { 
-          'Authorization': `Bearer ${adminToken || ''}`,
-          'x-admin-pin': pin 
+    setConfirmModal({
+      isOpen: true,
+      title: 'Delete Registration Entry?',
+      itemDetails: {
+        name: itemToDelete.name,
+        division: itemToDelete.division,
+        rollNumber: String(itemToDelete.roll_number),
+        topic: itemToDelete.topic,
+        member2Name: itemToDelete.member2_name,
+        member2RollNumber: itemToDelete.member2_roll_number ? String(itemToDelete.member2_roll_number) : null,
+      },
+      confirmText: 'Delete Registration',
+      cancelText: 'Cancel',
+      onConfirm: async () => {
+        setIsDeleting(true);
+        try {
+          const success = await store.deleteRegistration(id, adminToken, pin);
+          if (success) {
+            const deletedRecord: DeletedRegistration = {
+              ...itemToDelete,
+              deleted_at: new Date().toISOString()
+            };
+            setDeletedHistory(prev => [deletedRecord, ...prev]);
+            setRegistrations(store.getRegistrations());
+          } else {
+            setError('Failed to delete registration from server.');
+          }
+        } catch (err) {
+          console.error(err);
+          setError('Error occurred while deleting registration.');
+        } finally {
+          setIsDeleting(false);
+          setConfirmModal(null);
         }
-      });
-      if (response.ok) {
-        const deletedRecord: DeletedRegistration = {
-          ...itemToDelete,
-          deleted_at: new Date().toISOString()
-        };
-        setDeletedHistory(prev => [deletedRecord, ...prev]);
-        setRegistrations(prev => prev.filter(r => r.id !== id));
-      } else {
-        alert('Failed to delete.');
       }
-    } catch (err) {
-      console.error(err);
-      alert('Error deleting registration.');
-    }
+    });
   };
 
   const clearHistory = () => {
-    if (window.confirm('Clear all deletion history log?')) {
-      setDeletedHistory([]);
-    }
+    setConfirmModal({
+      isOpen: true,
+      title: 'Clear Deletion History?',
+      message: 'Are you sure you want to permanently clear the entire deletion history log? This action cannot be undone.',
+      confirmText: 'Clear Log History',
+      cancelText: 'Cancel',
+      onConfirm: () => {
+        setDeletedHistory([]);
+        setConfirmModal(null);
+      }
+    });
   };
 
   const exportToExcel = () => {
@@ -358,8 +400,13 @@ const AdminPanel = () => {
       return true;
     });
 
-    // Sort entries by roll_number ascending
-    return list.sort((a, b) => a.roll_number - b.roll_number);
+    // Sort entries by latest submission first (created_at descending, fallback id descending)
+    return list.sort((a, b) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+      return b.id - a.id;
+    });
   }, [registrations, selectedDivision, selectedFormat, searchQuery]);
 
   const formatDate = (dateStr: string) => {
@@ -593,7 +640,7 @@ const AdminPanel = () => {
           Registrations by Division
         </h3>
 
-        <div className="h-44 sm:h-52 flex items-end justify-around gap-3 sm:gap-8 pt-6 pb-2 border-b border-border/40 w-full">
+        <div className="h-44 sm:h-52 flex items-end justify-around gap-1.5 sm:gap-6 pt-6 pb-2 border-b border-border/40 w-full">
           {ALL_DIVISIONS.map((division) => {
             const count = analytics.divisionCounts[division] || 0;
             const percentage = Math.max((count / maxDivisionCount) * 100, 4);
@@ -628,10 +675,17 @@ const AdminPanel = () => {
                 </div>
 
                 {/* Division X-Axis Label */}
-                <span className={`text-[11px] font-semibold mt-3 transition-all ${
+                <span className={`text-[10px] sm:text-[11px] font-semibold mt-2.5 text-center whitespace-nowrap transition-all ${
                   isSelected ? 'text-accent font-bold scale-105' : 'text-ink-light group-hover:text-ink'
                 }`}>
-                  {division}
+                  {division === 'E-Commerce' ? (
+                    <>
+                      <span className="hidden sm:inline">E-Commerce</span>
+                      <span className="sm:hidden">E-Com</span>
+                    </>
+                  ) : (
+                    division
+                  )}
                 </span>
               </div>
             );
@@ -821,18 +875,18 @@ const AdminPanel = () => {
       </div>
 
       {/* ---------------------------------------------------------
-          DELETION HISTORY MODAL
+          DELETION HISTORY MODAL (PORTALED TO BODY)
          --------------------------------------------------------- */}
-      <AnimatePresence>
-        {showHistoryModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
+      {showHistoryModal && createPortal(
+        <AnimatePresence>
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+            {/* Backdrop with reduced light blur opacity */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setShowHistoryModal(false)}
-              className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm"
             />
 
             {/* Modal Box */}
@@ -933,8 +987,117 @@ const AdminPanel = () => {
               </div>
             </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>,
+        document.body
+      )}
+
+      {/* ---------------------------------------------------------
+          CUSTOM CONFIRMATION DIALOGUE MODAL (PORTALED TO BODY)
+         --------------------------------------------------------- */}
+      {confirmModal && confirmModal.isOpen && createPortal(
+        <AnimatePresence>
+          <div className="fixed inset-0 z-[99999] flex items-center justify-center p-4">
+            {/* Backdrop with reduced light blur opacity */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => !isDeleting && setConfirmModal(null)}
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm"
+            />
+
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.94, y: 15 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="relative w-full max-w-md bg-surface border border-border rounded-3xl p-6 sm:p-7 shadow-2xl overflow-hidden z-10 text-center"
+            >
+              {/* Warning Icon Badge */}
+              <div className="w-14 h-14 rounded-2xl bg-red-500/15 border border-red-500/25 text-red-500 flex items-center justify-center mx-auto mb-4 shadow-sm">
+                <Trash2 className="w-7 h-7" />
+              </div>
+
+              <h3 className="text-xl font-bold font-heading text-ink mb-1">
+                {confirmModal.title}
+              </h3>
+
+              {/* Structured Registration Summary Box */}
+              {confirmModal.itemDetails ? (
+                <div className="w-full bg-background/80 border border-border rounded-2xl p-4 my-4 space-y-3 text-left shadow-sm">
+                  <div className="flex items-center justify-between border-b border-border/60 pb-2.5">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-red-500 flex items-center gap-1">
+                      <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                      ENTRY TO DELETE
+                    </span>
+                    <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-surface border border-border text-ink">
+                      Div {confirmModal.itemDetails.division} • Roll {confirmModal.itemDetails.rollNumber}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-[10px] uppercase font-bold text-ink-light tracking-wider block mb-0.5">
+                      Student Details
+                    </span>
+                    <p className="text-sm font-semibold text-ink">
+                      {confirmModal.itemDetails.name}
+                      {confirmModal.itemDetails.member2Name && ` & ${confirmModal.itemDetails.member2Name}`}
+                    </p>
+                  </div>
+
+                  <div className="pt-2 border-t border-border/40">
+                    <span className="text-[10px] uppercase font-bold text-ink-light tracking-wider block mb-0.5">
+                      Registered Seminar Topic
+                    </span>
+                    <p className="text-xs font-semibold text-ink leading-snug">
+                      {confirmModal.itemDetails.topic}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="text-xs sm:text-sm text-ink-light leading-relaxed my-4">
+                  {confirmModal.message}
+                </p>
+              )}
+
+              <p className="text-[11px] text-red-500 font-medium mb-5 flex items-center justify-center gap-1">
+                <AlertCircle className="w-3.5 h-3.5" />
+                <span>This action is permanent and cannot be undone.</span>
+              </p>
+
+              {/* Modal Buttons */}
+              <div className="grid grid-cols-2 gap-3 w-full">
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={() => setConfirmModal(null)}
+                  className="editorial-button-secondary !w-full py-2.5 text-xs font-semibold"
+                >
+                  {confirmModal.cancelText || 'Cancel'}
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={confirmModal.onConfirm}
+                  className="py-2.5 px-4 text-xs font-semibold rounded-full bg-red-600 hover:bg-red-700 text-white transition-all shadow-md flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  {isDeleting ? (
+                    <span>Deleting...</span>
+                  ) : (
+                    <>
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>{confirmModal.confirmText || 'Confirm Delete'}</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </AnimatePresence>,
+        document.body
+      )}
     </motion.div>
   );
 };

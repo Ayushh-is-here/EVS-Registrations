@@ -12,6 +12,12 @@ export function getSupabase(): SupabaseClient {
     throw new Error('Missing SUPABASE_URL or SUPABASE_SERVICE_KEY environment variables in Vercel project settings.');
   }
 
-  supabaseClient = createClient(url, key);
+  supabaseClient = createClient(url, key, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false
+    }
+  });
   return supabaseClient;
 }

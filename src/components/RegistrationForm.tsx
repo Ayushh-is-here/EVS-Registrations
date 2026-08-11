@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
-import { Check, AlertCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Check, AlertCircle, AlertTriangle, Loader2, CheckCircle2, BookOpen, Mail, Copy, Info, Image } from 'lucide-react';
+import { toPng } from 'html-to-image';
 import CustomSelect from './CustomSelect';
 import KineticHeading from './KineticHeading';
 
@@ -41,6 +42,7 @@ const RegistrationForm: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [copiedSummary, setCopiedSummary] = useState(false);
 
   // Live roll checking states
   const [checkingRoll1, setCheckingRoll1] = useState(false);
@@ -50,6 +52,57 @@ const RegistrationForm: React.FC = () => {
   const [roll2Status, setRoll2Status] = useState<{ valid: boolean; taken?: boolean; message?: string } | null>(null);
 
   const divisions = ['A', 'B', 'C', 'D', 'E-Commerce', 'E-Arts'];
+
+  const generateSummaryText = () => {
+    return `=== EVS TOPIC REGISTRATION RECEIPT ===
+Symbiosis College of Arts and Commerce
+Division: Division ${formData.division}
+Format: ${formData.isGroup ? 'Group Presentation (2 Members)' : 'Individual Presentation'}
+
+--- STUDENT DETAILS ---
+Name: ${formData.name}
+Roll Number: ${formData.rollNumber}
+${formData.projectTopic ? `Blue Book Project Topic: ${formData.projectTopic}` : ''}
+
+${formData.isGroup && formData.member2Name ? `--- MEMBER 2 DETAILS ---
+Name: ${formData.member2Name}
+Roll Number: ${formData.member2RollNumber}
+${formData.member2ProjectTopic ? `Blue Book Project Topic: ${formData.member2ProjectTopic}` : ''}` : ''}
+
+--- REGISTERED SEMINAR TOPIC ---
+Topic: ${formData.topic}
+
+Registered Date: ${new Date().toLocaleString()}
+=====================================`;
+  };
+
+  const receiptRef = useRef<HTMLDivElement>(null);
+
+  const handleCopySummary = () => {
+    navigator.clipboard.writeText(generateSummaryText());
+    setCopiedSummary(true);
+    setTimeout(() => setCopiedSummary(false), 2000);
+  };
+
+  const handleDownloadReceipt = async () => {
+    if (!receiptRef.current) return;
+    try {
+      const dataUrl = await toPng(receiptRef.current, {
+        cacheBust: true,
+        pixelRatio: 3,
+        style: {
+          borderRadius: '24px',
+          padding: '24px',
+        }
+      });
+      const link = document.createElement('a');
+      link.download = `EVS_Registration_Div${formData.division}_Roll${formData.rollNumber}.png`;
+      link.href = dataUrl;
+      link.click();
+    } catch (err) {
+      console.error('Failed to capture receipt screenshot:', err);
+    }
+  };
 
   // Fetch registered topics on mount for live similarity checking
   useEffect(() => {
@@ -252,32 +305,126 @@ const RegistrationForm: React.FC = () => {
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
-        className="w-full max-w-[520px]"
+        className="w-full max-w-[540px] mx-auto px-2 sm:px-0"
       >
-        <div className="editorial-card !p-0">
-          <div className="p-8 md:p-10 w-full h-full flex flex-col items-center justify-center min-h-[400px]">
+        <div className="editorial-card relative overflow-hidden !p-5 sm:!p-8">
+          <div ref={receiptRef} className="w-full flex flex-col items-center bg-surface p-6 sm:p-8 rounded-3xl">
+            {/* Animated Success Badge */}
             <motion.div
               initial={{ scale: 0, rotate: -45 }}
               animate={{ scale: 1, rotate: 0 }}
               transition={{ type: 'spring', damping: 15, stiffness: 200, delay: 0.1 }}
-              className="w-20 h-20 rounded-full bg-accent/20 flex items-center justify-center mb-8 relative shadow-glow"
+              className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mb-4 relative shadow-glow"
             >
-              <div className="absolute inset-0 rounded-full border border-accent/40 animate-ping opacity-50" />
-              <svg className="w-10 h-10 text-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
+              <div className="absolute inset-0 rounded-full border border-emerald-500/40 animate-ping opacity-40" />
+              <CheckCircle2 className="w-8 h-8" />
             </motion.div>
 
-            <KineticHeading as="h2" text="Topic Registered" className="text-3xl mb-4 font-heading text-ink" glowSweep />
-
-            <p className="text-ink-light mb-8 max-w-md text-center">
-              Your topic has been successfully registered. Come back to the Upload page and enter your Division + Roll Number + Name to find your submission when you're ready.
+            <KineticHeading as="h2" text="Registration Confirmed!" className="text-2xl sm:text-3xl mb-1 font-heading font-bold text-ink" glowSweep />
+            <p className="text-ink-light text-xs sm:text-sm text-center mb-6">
+              Your EVS topic registration has been recorded successfully.
             </p>
+
+            {/* Detailed Registration Summary Card */}
+            <div className="w-full bg-background border border-border rounded-2xl p-5 space-y-4 text-left shadow-sm">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                  REGISTRATION DETAILS
+                </span>
+                <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-surface border border-border text-ink">
+                  Division {formData.division} • {formData.isGroup ? 'Group' : 'Individual'}
+                </span>
+              </div>
+
+              {/* Member 1 Info */}
+              <div className="space-y-1">
+                <span className="text-[10px] uppercase font-bold text-ink-light tracking-wider block">
+                  {formData.isGroup ? 'Student Member 1' : 'Student Details'}
+                </span>
+                <p className="text-sm sm:text-base font-semibold text-ink">
+                  {formData.name} <span className="font-mono text-xs text-ink-light font-normal">(Roll No. {formData.rollNumber})</span>
+                </p>
+                {formData.projectTopic && (
+                  <p className="text-xs text-ink-light">
+                    Blue Book Project: <span className="text-ink font-medium">{formData.projectTopic}</span>
+                  </p>
+                )}
+              </div>
+
+              {/* Member 2 Info if group */}
+              {formData.isGroup && formData.member2Name && (
+                <div className="pt-2 border-t border-border/40 space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-ink-light tracking-wider block">
+                    Student Member 2
+                  </span>
+                  <p className="text-sm sm:text-base font-semibold text-ink">
+                    {formData.member2Name} <span className="font-mono text-xs text-ink-light font-normal">(Roll No. {formData.member2RollNumber})</span>
+                  </p>
+                  {formData.member2ProjectTopic && (
+                    <p className="text-xs text-ink-light">
+                      Blue Book Project: <span className="text-ink font-medium">{formData.member2ProjectTopic}</span>
+                    </p>
+                  )}
+                </div>
+              )}
+
+              {/* Seminar Topic */}
+              <div className="pt-2 border-t border-border/40 space-y-1">
+                <span className="text-[10px] uppercase font-bold text-accent tracking-wider block">
+                  Registered Seminar Topic
+                </span>
+                <p className="text-base font-semibold text-ink leading-snug">
+                  {formData.topic}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Advice Disclaimer Banner (Excluded from downloaded image) */}
+          <div className="w-full mt-6 p-4 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 text-xs sm:text-sm flex items-start gap-3 shadow-sm">
+            <Info className="w-5 h-5 flex-shrink-0 text-amber-600 dark:text-amber-400 mt-0.5" />
+            <div className="leading-relaxed font-sans">
+              <strong className="font-semibold block mb-1 text-amber-800 dark:text-amber-300">Important Advice:</strong>
+              Please save a copy or take a screenshot of your registration details now for your future reference when submitting your presentation file.
+            </div>
+          </div>
+
+          {/* Action Buttons (Excluded from downloaded image) */}
+          <div className="w-full space-y-3 mt-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              <button
+                type="button"
+                onClick={handleDownloadReceipt}
+                className="editorial-button-primary py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Image className="w-4 h-4" />
+                <span>Download Image Receipt</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleCopySummary}
+                className="editorial-button-secondary py-3 text-xs sm:text-sm font-semibold flex items-center justify-center gap-2"
+              >
+                {copiedSummary ? <Check className="w-4 h-4 text-emerald-500" /> : <Copy className="w-4 h-4 text-accent" />}
+                <span>{copiedSummary ? 'Copied Details!' : 'Copy Summary Text'}</span>
+              </button>
+            </div>
+
+            <button
+              onClick={() => navigate('/topics')}
+              className="editorial-button-secondary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
+            >
+              <BookOpen className="w-4 h-4 text-accent" />
+              <span>View All Registered Topics</span>
+            </button>
+
             <button
               onClick={() => navigate('/upload')}
-              className="editorial-button-primary w-full max-w-xs"
+              className="editorial-button-secondary w-full py-2.5 text-xs font-semibold flex items-center justify-center gap-2"
             >
-              Go to Upload Page
+              <Mail className="w-4 h-4 text-accent" />
+              <span>Go to Submissions / Uploads Page</span>
             </button>
           </div>
         </div>

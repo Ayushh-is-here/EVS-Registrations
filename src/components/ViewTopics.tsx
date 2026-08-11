@@ -2,43 +2,41 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Clock } from 'lucide-react';
 import KineticHeading from './KineticHeading';
-
-interface TopicData {
-  id: number;
-  division: string;
-  topic: string;
-  project_topic?: string | null;
-  member2_project_topic?: string | null;
-  has_uploaded: boolean;
-}
+import { store, type TopicData } from '../lib/store';
 
 const ViewTopics = () => {
-  const [topics, setTopics] = useState<TopicData[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [topics, setTopics] = useState<TopicData[]>(() => store.getTopics());
+  const [loading, setLoading] = useState(() => !store.isTopicsLoaded() && store.getTopics().length === 0);
   const [error, setError] = useState('');
   const [selectedDivision, setSelectedDivision] = useState<string>('All');
 
   useEffect(() => {
-    const fetchTopics = async () => {
+    // Sync with store updates
+    const unsubscribe = store.subscribe(() => {
+      setTopics(store.getTopics());
+      setLoading(false);
+    });
+
+    const initTopics = async () => {
       try {
-        const response = await fetch('/api/topics');
-        const data = await response.json().catch(() => ({}));
-        
-        if (!response.ok) {
-          throw new Error(data.error || 'Could not load topics right now.');
-        }
-        setTopics(data.topics || []);
+        const data = await store.loadTopics();
+        setTopics(data);
       } catch (err: any) {
         console.error('Fetch topics error:', err);
-        setError(err.message || 'We couldn\'t load the registered topics at the moment. Please try refreshing in a few moments.');
+        if (store.getTopics().length === 0) {
+          setError(err.message || 'We couldn\'t load the registered topics at the moment.');
+        }
       } finally {
         setLoading(false);
       }
     };
-    fetchTopics();
+
+    initTopics();
+    return () => unsubscribe();
   }, []);
 
-  const divisions = ['All', ...Array.from(new Set(topics.map(t => t.division)))].sort();
+  const rawDivisions = Array.from(new Set(topics.map(t => t.division))).sort();
+  const divisions = ['All', ...rawDivisions];
   const filteredTopics = selectedDivision === 'All' 
     ? topics 
     : topics.filter(t => t.division === selectedDivision);

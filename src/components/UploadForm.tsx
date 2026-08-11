@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Mail, Copy, Check, AlertCircle, RefreshCw, Send, ArrowLeft, ExternalLink } from 'lucide-react';
+import { Mail, Copy, Check, AlertCircle, RefreshCw, Send, ArrowLeft, ExternalLink, Calendar, Lock } from 'lucide-react';
 import KineticHeading from './KineticHeading';
 import CustomSelect from './CustomSelect';
 
@@ -24,6 +24,9 @@ const divisionOptions = [
 // Target professor / submission inbox email address
 const DEFAULT_SUBMISSION_EMAIL = 'ayushh108@gmail.com';
 
+// Official date when presentation submissions open
+const SUBMISSION_OPEN_DATE = new Date('2026-09-01T00:00:00+05:30');
+
 export default function UploadForm() {
   const [step, setStep] = useState<1 | 2>(1);
   const [lookupData, setLookupData] = useState({ division: 'A', rollNumber: '', name: '' });
@@ -32,6 +35,8 @@ export default function UploadForm() {
   const [error, setError] = useState<string | null>(null);
   const [copiedSubject, setCopiedSubject] = useState(false);
   const [copiedBody, setCopiedBody] = useState(false);
+
+  const isBeforeOpeningDate = new Date() < SUBMISSION_OPEN_DATE;
 
   // Safety guard: Lock user to Step 1 if student details are missing/unverified
   useEffect(() => {
@@ -42,6 +47,8 @@ export default function UploadForm() {
 
   const handleLookupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isBeforeOpeningDate) return;
+
     const roll = lookupData.rollNumber.trim();
     const name = lookupData.name.trim();
 
@@ -107,7 +114,7 @@ ${studentDetails.name}`
 
   // Direct Gmail Web Compose URL (bypasses OS mailto handler issues!)
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(DEFAULT_SUBMISSION_EMAIL)}&su=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
-  
+
   // Standard mailto link fallback
   const mailtoUrl = `mailto:${DEFAULT_SUBMISSION_EMAIL}?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
 
@@ -126,7 +133,7 @@ ${studentDetails.name}`
   const isStep1Valid = lookupData.rollNumber.trim().length > 0 && lookupData.name.trim().length > 0;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -134,9 +141,9 @@ ${studentDetails.name}`
     >
       <div className="editorial-card relative overflow-hidden !p-5 sm:!p-10">
         <div className="mb-6 sm:mb-8 text-center flex flex-col items-center">
-          <KineticHeading 
-            as="h1" 
-            text="EVS Submission" 
+          <KineticHeading
+            as="h1"
+            text="EVS Submission"
             className="text-3xl sm:text-4xl font-heading font-bold tracking-tight mb-3 text-ink"
             glowSweep
           />
@@ -153,9 +160,39 @@ ${studentDetails.name}`
           </p>
         </div>
 
+        {/* ---------------------------------------------------------
+            AUTOMATED SEPTEMBER 1ST OPENING NOTICE & BARRIER
+           --------------------------------------------------------- */}
+        <AnimatePresence>
+          {isBeforeOpeningDate && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 space-y-2.5 shadow-sm relative overflow-hidden"
+            >
+              <div className="flex items-center gap-2.5 font-heading font-semibold text-sm sm:text-base text-amber-800 dark:text-amber-300">
+                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-600 dark:text-amber-400">
+                  <Calendar className="w-4 h-4" />
+                </div>
+                <div>
+                  <span>Submissions Open September 1, 2026</span>
+                  <span className="block text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400 opacity-90 mt-0.5">
+                    Official Notice
+                  </span>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans pt-1">
+                Please note that presentation submissions will officially open on <strong>September 1, 2026</strong>. Kindly finalize your slides and project work in advance. The online submission portal will automatically activate starting September 1st.
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait">
           {error && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -176,13 +213,13 @@ ${studentDetails.name}`
                 value={lookupData.division}
                 onChange={(val) => setLookupData({ ...lookupData, division: val })}
                 placeholder="Select Division"
-                disabled={isLoading}
+                disabled={isLoading || isBeforeOpeningDate}
               />
             </div>
 
             <div>
               <label className="editorial-label text-xs sm:text-sm" htmlFor="rollNumber">Roll Number</label>
-              <input 
+              <input
                 type="number"
                 id="rollNumber"
                 min={2000}
@@ -190,33 +227,38 @@ ${studentDetails.name}`
                 placeholder="e.g. 2315"
                 value={lookupData.rollNumber}
                 onChange={(e) => setLookupData({ ...lookupData, rollNumber: e.target.value })}
-                className="editorial-input min-h-[48px] text-base"
-                disabled={isLoading}
+                className="editorial-input min-h-[48px] text-base disabled:opacity-50"
+                disabled={isLoading || isBeforeOpeningDate}
                 required
               />
             </div>
 
             <div>
               <label className="editorial-label text-xs sm:text-sm" htmlFor="name">Full Name</label>
-              <input 
+              <input
                 type="text"
                 id="name"
                 placeholder="Enter registered full name"
                 value={lookupData.name}
                 onChange={(e) => setLookupData({ ...lookupData, name: e.target.value })}
-                className="editorial-input min-h-[48px] text-base"
-                disabled={isLoading}
+                className="editorial-input min-h-[48px] text-base disabled:opacity-50"
+                disabled={isLoading || isBeforeOpeningDate}
                 required
               />
             </div>
 
             <div className="pt-2">
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="editorial-button-primary w-full py-3.5 text-sm sm:text-base min-h-[48px] disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading || !isStep1Valid}
+                disabled={isLoading || !isStep1Valid || isBeforeOpeningDate}
               >
-                {isLoading ? (
+                {isBeforeOpeningDate ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Lock className="w-4 h-4" />
+                    Submissions Open Sept 1st
+                  </span>
+                ) : isLoading ? (
                   <span className="flex items-center justify-center gap-2">
                     <RefreshCw className="animate-spin h-5 w-5 text-white" />
                     Verifying Details...
@@ -258,7 +300,7 @@ ${studentDetails.name}`
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-medium text-ink-light">Subject:</span>
-                  <button 
+                  <button
                     onClick={handleCopySubject}
                     className="text-xs text-accent hover:underline flex items-center gap-1 font-medium"
                   >
@@ -275,7 +317,7 @@ ${studentDetails.name}`
               <div>
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs font-medium text-ink-light">Message Body:</span>
-                  <button 
+                  <button
                     onClick={handleCopyBody}
                     className="text-xs text-accent hover:underline flex items-center gap-1 font-medium"
                   >
@@ -291,7 +333,7 @@ ${studentDetails.name}`
 
             {/* Direct Gmail & Mail App Actions */}
             <div className="space-y-3 pt-1">
-              <a 
+              <a
                 href={gmailUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -302,7 +344,7 @@ ${studentDetails.name}`
                 <ExternalLink className="w-4 h-4 opacity-80" />
               </a>
 
-              <a 
+              <a
                 href={mailtoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -316,7 +358,7 @@ ${studentDetails.name}`
                 📌 <strong>Important:</strong> Remember to attach your presentation file (<code>.pptx</code> or <code>.pdf</code>) in Gmail before sending!
               </p>
 
-              <button 
+              <button
                 type="button"
                 onClick={() => setStep(1)}
                 className="editorial-button-secondary w-full py-2.5 text-xs sm:text-sm min-h-[42px] flex items-center justify-center gap-2"
