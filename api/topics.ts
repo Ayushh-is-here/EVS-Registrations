@@ -13,7 +13,7 @@ export default async function handler(req: any, res: any) {
       .order('division', { ascending: true })
       .order('id', { ascending: true });
 
-    res.setHeader('Cache-Control', 'public, max-age=10, s-maxage=10, stale-while-revalidate=60');
+    res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=600');
     return res.status(200).json({ topics });
   } catch (error: any) {
     console.error('Fetch Topics API Error:', error);
