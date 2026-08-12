@@ -365,7 +365,7 @@ const Assignments = () => {
                     </h2>
                   </div>
                   <p className="text-xs text-ink-light mt-1 font-body">
-                    5 Journal Questions & ~200-Word Model Answers
+                    5 Journal Questions & ~400-Word Comprehensive Model Answers
                   </p>
                 </div>
 
@@ -446,7 +446,7 @@ const Assignments = () => {
                             <BookOpenCheck className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>
                               {isAnswerOpen ? 'Hide Answer' : 'View Answer'}
-                              <span className="hidden sm:inline"> (~200 words)</span>
+                              <span className="hidden sm:inline"> (~400 words)</span>
                             </span>
                             {isAnswerOpen ? (
                               <ChevronUp className="w-3.5 h-3.5 flex-shrink-0" />
@@ -472,7 +472,7 @@ const Assignments = () => {
                             <div className="flex items-center justify-between mb-3 pb-2 border-b border-border/40 gap-2">
                               <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-semibold text-accent uppercase tracking-wider">
                                 <BookOpenCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent flex-shrink-0" />
-                                <span>Model Answer <span className="hidden sm:inline">(~200 Words)</span></span>
+                                <span>Model Answer <span className="hidden sm:inline">(~400 Words)</span></span>
                               </div>
 
                               <button
