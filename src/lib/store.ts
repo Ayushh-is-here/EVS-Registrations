@@ -18,6 +18,7 @@ export interface Registration {
 
 export interface TopicData {
   id: number;
+  created_at?: string;
   division: string;
   topic: string;
   project_topic?: string | null;
@@ -57,10 +58,15 @@ class CentralStore {
   }
 
   // ---------------------------------------------------------
-  // TOPICS MANAGEMENT (0ms Instant Browsing)
+  // TOPICS MANAGEMENT (Latest First & 0ms Instant Browsing)
   // ---------------------------------------------------------
   getTopics(): TopicData[] {
-    return this.topics;
+    return [...this.topics].sort((a, b) => {
+      const timeA = a.created_at ? new Date(a.created_at).getTime() : 0;
+      const timeB = b.created_at ? new Date(b.created_at).getTime() : 0;
+      if (timeB !== timeA) return timeB - timeA;
+      return b.id - a.id;
+    });
   }
 
   isTopicsLoaded(): boolean {
@@ -77,7 +83,7 @@ class CentralStore {
           this.notify();
         }
       });
-      return this.topics;
+      return this.getTopics();
     }
 
     const data = await this.fetchTopicsFromSource();
@@ -85,7 +91,7 @@ class CentralStore {
     this.topicsLoaded = true;
     this.saveTopicsCache();
     this.notify();
-    return this.topics;
+    return this.getTopics();
   }
 
   private saveTopicsCache() {
@@ -102,8 +108,8 @@ class CentralStore {
       try {
         const { data, error } = await supabase
           .from('registrations')
-          .select('id, division, topic, project_topic, member2_project_topic, has_uploaded')
-          .order('division', { ascending: true })
+          .select('id, created_at, division, topic, project_topic, member2_project_topic, has_uploaded')
+          .order('created_at', { ascending: false })
           .order('id', { ascending: false });
 
         if (!error && data) {

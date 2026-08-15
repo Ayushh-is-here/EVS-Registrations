@@ -9,9 +9,9 @@ export default async function handler(req: any, res: any) {
     const supabase = getSupabase();
     const { data: topics, error } = await supabase
       .from('registrations')
-      .select('id, division, topic, project_topic, member2_project_topic, has_uploaded')
-      .order('division', { ascending: true })
-      .order('id', { ascending: true });
+      .select('id, created_at, division, topic, project_topic, member2_project_topic, has_uploaded')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false });
 
     res.setHeader('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=600');
     return res.status(200).json({ topics });

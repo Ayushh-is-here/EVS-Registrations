@@ -181,9 +181,9 @@ app.get('/api/topics', async (req, res) => {
   try {
     const { data: topics, error } = await supabase
       .from('registrations')
-      .select('id, division, topic, has_uploaded')
-      .order('division', { ascending: true })
-      .order('id', { ascending: true }); // deterministic ordering
+      .select('id, created_at, division, topic, project_topic, member2_project_topic, has_uploaded')
+      .order('created_at', { ascending: false })
+      .order('id', { ascending: false });
 
     if (error) throw error;
 
