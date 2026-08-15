@@ -54,17 +54,34 @@ const AnimatedBackground: React.FC = () => {
     };
   }, [videoReady]);
 
+  const hasStartedRef = useRef(false);
+
   // Video playback initialization
   const handleVideoReady = () => {
-    if (videoRef.current) {
-      videoRef.current.playbackRate = 1.0;
-      videoRef.current.currentTime = 3;
-      videoRef.current.play().catch(() => {
-        // Autoplay may be restricted on some devices until interaction
+    if (!hasStartedRef.current && videoRef.current) {
+      hasStartedRef.current = true;
+      const video = videoRef.current;
+      video.defaultMuted = true;
+      video.muted = true;
+      video.playbackRate = 1.0;
+      video.play().catch((err) => {
+        console.warn('Autoplay prevented or waiting for interaction:', err);
       });
     }
     setVideoReady(true);
   };
+
+  // Ensure playback starts on mount if already cached/ready
+  useEffect(() => {
+    if (videoRef.current) {
+      const video = videoRef.current;
+      video.defaultMuted = true;
+      video.muted = true;
+      if (video.readyState >= 2) {
+        handleVideoReady();
+      }
+    }
+  }, []);
 
   return (
     <>
@@ -87,8 +104,8 @@ const AnimatedBackground: React.FC = () => {
             muted
             playsInline
             preload="auto"
-            onCanPlayThrough={handleVideoReady}
-            onPlaying={handleVideoReady}
+            onLoadedData={handleVideoReady}
+            onCanPlay={handleVideoReady}
             onError={() => setVideoReady(true)}
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
               videoReady ? 'opacity-100' : 'opacity-0'
