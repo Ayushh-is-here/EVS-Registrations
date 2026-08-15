@@ -4,7 +4,7 @@ import EcoPreloader from './EcoPreloader';
 // External hosted video URL
 const EXTERNAL_VIDEO_URL =
   (import.meta as any).env?.VITE_BACKGROUND_VIDEO_URL ||
-  'https://znwftdisykivjvexudwe.supabase.co/storage/v1/object/public/assets/background.mp4';
+  'https://github.com/Ayushh-is-here/EVS-Registrations/releases/download/v1.0.0/background_1080p_hd.mp4';
 
 const AnimatedBackground: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -107,9 +107,8 @@ const AnimatedBackground: React.FC = () => {
             onLoadedData={handleVideoReady}
             onCanPlay={handleVideoReady}
             onError={() => setVideoReady(true)}
-            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${
-              videoReady ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ${videoReady ? 'opacity-100' : 'opacity-0'
+              }`}
           />
         )}
 
