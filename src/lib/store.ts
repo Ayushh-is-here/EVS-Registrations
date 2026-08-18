@@ -191,34 +191,21 @@ class CentralStore {
 
   async deleteRegistration(id: number, token?: string | null, pin?: string): Promise<boolean> {
     const itemToDelete = this.registrations.find(r => r.id === id);
-    
-    // Direct Supabase delete attempt
-    const supabase = getFrontendSupabase();
     let success = false;
 
-    if (supabase) {
-      try {
-        const { error } = await supabase.from('registrations').delete().eq('id', id);
-        if (!error) success = true;
-      } catch {
-        success = false;
-      }
-    }
-
-    if (!success) {
-      try {
-        const activeToken = token || sessionStorage.getItem('evs_admin_token');
-        const response = await fetch(`/api/admin/registrations/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${activeToken || ''}`,
-            'x-admin-pin': pin || ''
-          }
-        });
-        if (response.ok) success = true;
-      } catch {
-        success = false;
-      }
+    try {
+      const activeToken = token || sessionStorage.getItem('evs_admin_token');
+      const response = await fetch(`/api/admin/registrations/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${activeToken || ''}`,
+          'x-admin-pin': pin || ''
+        }
+      });
+      if (response.ok) success = true;
+    } catch (err) {
+      console.error('Delete registration error:', err);
+      success = false;
     }
 
     if (success && itemToDelete) {
