@@ -2,9 +2,9 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, type Variants } from 'framer-motion';
 import { Check, AlertCircle, AlertTriangle, Loader2, CheckCircle2, BookOpen, Mail, Copy, Info, Image } from 'lucide-react';
-import { toPng } from 'html-to-image';
 import CustomSelect from './CustomSelect';
 import KineticHeading from './KineticHeading';
+import { downloadReceiptImage } from '../utils/generateReceiptImage';
 
 interface ExistingTopic {
   id: number;
@@ -76,32 +76,27 @@ Registered Date: ${new Date().toLocaleString()}
 =====================================`;
   };
 
-  const receiptRef = useRef<HTMLDivElement>(null);
-
   const handleCopySummary = () => {
     navigator.clipboard.writeText(generateSummaryText());
     setCopiedSummary(true);
     setTimeout(() => setCopiedSummary(false), 2000);
   };
 
-  const handleDownloadReceipt = async () => {
-    if (!receiptRef.current) return;
-    try {
-      const dataUrl = await toPng(receiptRef.current, {
-        cacheBust: true,
-        pixelRatio: 3,
-        style: {
-          borderRadius: '24px',
-          padding: '24px',
-        }
-      });
-      const link = document.createElement('a');
-      link.download = `EVS_Registration_Div${formData.division}_Roll${formData.rollNumber}.png`;
-      link.href = dataUrl;
-      link.click();
-    } catch (err) {
-      console.error('Failed to capture receipt screenshot:', err);
-    }
+  const receiptCardRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadReceipt = () => {
+    downloadReceiptImage({
+      division: formData.division,
+      rollNumber: formData.rollNumber,
+      name: formData.name,
+      topic: formData.topic,
+      projectTopic: formData.projectTopic || null,
+      isGroup: formData.isGroup,
+      member2RollNumber: formData.member2RollNumber || null,
+      member2Name: formData.member2Name || null,
+      member2ProjectTopic: formData.member2ProjectTopic || null,
+      createdAt: new Date().toISOString(),
+    }, receiptCardRef.current);
   };
 
   // Fetch registered topics on mount for live similarity checking
@@ -308,7 +303,7 @@ Registered Date: ${new Date().toLocaleString()}
         className="w-full max-w-[540px] mx-auto px-2 sm:px-0"
       >
         <div className="editorial-card relative overflow-hidden !p-5 sm:!p-8">
-          <div ref={receiptRef} className="w-full flex flex-col items-center bg-surface p-6 sm:p-8 rounded-3xl">
+          <div ref={receiptCardRef} className="w-full flex flex-col items-center bg-surface p-6 sm:p-8 rounded-3xl">
             {/* Animated Success Badge */}
             <motion.div
               initial={{ scale: 0, rotate: -45 }}

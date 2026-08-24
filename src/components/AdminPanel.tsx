@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import KineticHeading from './KineticHeading';
 import { store, type Registration } from '../lib/store';
+import { downloadReceiptImage } from '../utils/generateReceiptImage';
 
 interface DeletedRegistration extends Registration {
   deleted_at: string;
@@ -79,6 +80,9 @@ const AdminPanel = () => {
   });
 
   const [showHistoryModal, setShowHistoryModal] = useState(false);
+
+  // Direct Download State
+  const [downloadingId, setDownloadingId] = useState<number | null>(null);
 
   // Search & Filter States
   const [searchQuery, setSearchQuery] = useState('');
@@ -261,6 +265,29 @@ const AdminPanel = () => {
         setConfirmModal(null);
       }
     });
+  };
+
+  const handleDirectDownload = async (reg: Registration) => {
+    setDownloadingId(reg.id);
+    try {
+      await downloadReceiptImage({
+        division: reg.division,
+        rollNumber: reg.roll_number,
+        name: reg.name,
+        topic: reg.topic,
+        projectTopic: reg.project_topic,
+        isGroup: Boolean(reg.member2_name || reg.member2_roll_number),
+        member2RollNumber: reg.member2_roll_number,
+        member2Name: reg.member2_name,
+        member2ProjectTopic: reg.member2_project_topic,
+        createdAt: reg.created_at,
+        hasUploaded: reg.has_uploaded,
+      });
+    } catch (err) {
+      console.error('Failed to download receipt image:', err);
+    } finally {
+      setTimeout(() => setDownloadingId(null), 600);
+    }
   };
 
   const exportToExcel = () => {
@@ -843,24 +870,43 @@ const AdminPanel = () => {
 
                         {/* Actions */}
                         <td className="py-4 px-5 align-middle text-right whitespace-nowrap">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end gap-1.5 sm:gap-2">
+                            {/* Direct Download Receipt Image Button (Minimal Icon Only) */}
+                            <button
+                              type="button"
+                              onClick={() => handleDirectDownload(reg)}
+                              disabled={downloadingId === reg.id}
+                              title="Download Registration Receipt"
+                              className="p-2 text-ink-light hover:text-ink bg-surface hover:bg-ink/5 border border-border/80 hover:border-border rounded-lg transition-all shadow-sm active:scale-95 disabled:opacity-50 flex items-center justify-center"
+                            >
+                              {downloadingId === reg.id ? (
+                                <RefreshCw className="w-4 h-4 animate-spin text-ink-light" />
+                              ) : (
+                                <Download className="w-4 h-4" />
+                              )}
+                            </button>
+
+                            {/* Presentation File Link */}
                             {reg.file_link && (
                               <a
                                 href={reg.file_link}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="p-1.5 rounded-lg text-accent hover:bg-accent/10 transition-colors"
+                                className="p-2 rounded-lg text-accent hover:bg-accent/10 border border-transparent hover:border-accent/20 transition-colors flex items-center justify-center"
                                 title="View Presentation File"
                               >
                                 <ExternalLink className="w-4 h-4" />
                               </a>
                             )}
+
+                            {/* Delete Action */}
                             <button
+                              type="button"
                               onClick={() => handleDelete(reg.id)}
-                              className="px-2.5 py-1 text-xs text-red-600 hover:text-red-700 bg-red-500/5 hover:bg-red-500/15 border border-red-500/20 rounded-lg transition-colors font-medium flex items-center gap-1"
+                              title="Delete Registration"
+                              className="p-2 text-red-600 hover:text-red-700 bg-red-500/5 hover:bg-red-500/15 border border-red-500/20 rounded-lg transition-colors font-medium flex items-center justify-center"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              <span>Delete</span>
+                              <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </td>

@@ -1,243 +1,228 @@
-interface RegistrationData {
+import { toPng } from 'html-to-image';
+
+export interface RegistrationReceiptData {
   division: string;
-  rollNumber: string;
+  rollNumber: string | number;
   name: string;
   topic: string;
-  projectTopic?: string;
+  projectTopic?: string | null;
   isGroup?: boolean;
-  member2RollNumber?: string;
-  member2Name?: string;
-  member2ProjectTopic?: string;
+  member2RollNumber?: string | number | null;
+  member2Name?: string | null;
+  member2ProjectTopic?: string | null;
+  createdAt?: string | null;
+  hasUploaded?: boolean;
 }
 
-export function downloadReceiptImage(data: RegistrationData) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
+export function generateReceiptSummaryText(data: RegistrationReceiptData): string {
+  const isGroup = Boolean(data.isGroup || data.member2Name || data.member2RollNumber);
+  const regDate = data.createdAt ? new Date(data.createdAt).toLocaleString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  }) : new Date().toLocaleString();
 
-  // Retina 2x resolution
-  const width = 1000;
-  const height = data.isGroup && data.member2Name ? 1240 : 1080;
-  canvas.width = width;
-  canvas.height = height;
+  return `=== EVS TOPIC REGISTRATION RECEIPT ===
+Symbiosis College of Arts and Commerce
+Division: Division ${data.division}
+Format: ${isGroup ? 'Group Presentation (2 Members)' : 'Individual Presentation'}
 
-  // 1. Background Gradient (Dark Forest Theme)
-  const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-  bgGradient.addColorStop(0, '#0a1210');
-  bgGradient.addColorStop(0.5, '#121e1a');
-  bgGradient.addColorStop(1, '#0b1411');
-  ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, width, height);
+--- STUDENT DETAILS ---
+Name: ${data.name}
+Roll Number: ${data.rollNumber}
+${data.projectTopic ? `Blue Book Project Topic: ${data.projectTopic}` : ''}
 
-  // Decorative Ambient Glow Orbs
-  const drawGlow = (x: number, y: number, r: number, color: string) => {
-    const radial = ctx.createRadialGradient(x, y, 0, x, y, r);
-    radial.addColorStop(0, color);
-    radial.addColorStop(1, 'transparent');
-    ctx.fillStyle = radial;
-    ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
-    ctx.fill();
-  };
+${isGroup && data.member2Name ? `--- MEMBER 2 DETAILS ---
+Name: ${data.member2Name}
+Roll Number: ${data.member2RollNumber || 'N/A'}
+${data.member2ProjectTopic ? `Blue Book Project Topic: ${data.member2ProjectTopic}` : ''}` : ''}
 
-  drawGlow(200, 150, 300, 'rgba(16, 185, 129, 0.15)'); // Emerald Glow Top Left
-  drawGlow(800, 900, 350, 'rgba(5, 150, 105, 0.12)');  // Teal Glow Bottom Right
+--- REGISTERED SEMINAR TOPIC ---
+Topic: ${data.topic}
 
-  // Helper for rounded rectangles
-  const roundRect = (x: number, y: number, w: number, h: number, r: number) => {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
-  };
+Registered Date: ${regDate}
+Status: Official EVS Portal Verified Record
+=====================================`;
+}
 
-  // 2. Main Card Container (Glassmorphic Outer Card)
-  const margin = 50;
-  const cardX = margin;
-  const cardY = margin;
-  const cardW = width - margin * 2;
-  const cardH = height - margin * 2;
+/**
+ * Downloads the exact post-registration confirmation card as a high-resolution PNG image
+ * matching the user interface preview card.
+ */
+export async function downloadReceiptImage(data: RegistrationReceiptData, existingElement?: HTMLElement | null): Promise<void> {
+  const filename = `EVS_Registration_Div${data.division}_Roll${data.rollNumber}.png`;
 
-  ctx.fillStyle = 'rgba(21, 34, 29, 0.85)';
-  roundRect(cardX, cardY, cardW, cardH, 24);
-  ctx.fill();
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(52, 211, 153, 0.25)';
-  ctx.stroke();
-
-  // Outer Header Badge Banner
-  ctx.fillStyle = '#10B981';
-  roundRect(cardX + 40, cardY + 40, 140, 28, 14);
-  ctx.fill();
-
-  ctx.font = 'bold 12px sans-serif';
-  ctx.fillStyle = '#064E3B';
-  ctx.textAlign = 'center';
-  ctx.fillText('SYMBIOSIS SCAC', cardX + 110, cardY + 58);
-
-  // Title: EVS REGISTRATION RECEIPT
-  ctx.textAlign = 'left';
-  ctx.font = 'bold 30px serif';
-  ctx.fillStyle = '#F9FAFB';
-  ctx.fillText('EVS Registration Receipt', cardX + 40, cardY + 110);
-
-  ctx.font = '500 14px sans-serif';
-  ctx.fillStyle = '#9CA3AF';
-  ctx.fillText('Environmental Studies • Grade 12 Official Record', cardX + 40, cardY + 135);
-
-  // Division & Format Pill Right-aligned
-  const badgeText = `DIV ${data.division} • ${data.isGroup ? 'GROUP' : 'INDIVIDUAL'}`;
-  ctx.font = 'bold 13px sans-serif';
-  const badgeWidth = ctx.measureText(badgeText).width + 30;
-  const badgeX = cardX + cardW - 40 - badgeWidth;
-  
-  ctx.fillStyle = 'rgba(16, 185, 129, 0.15)';
-  roundRect(badgeX, cardY + 105, badgeWidth, 34, 17);
-  ctx.fill();
-  ctx.strokeStyle = 'rgba(52, 211, 153, 0.4)';
-  ctx.lineWidth = 1;
-  ctx.stroke();
-
-  ctx.fillStyle = '#34D399';
-  ctx.fillText(badgeText, badgeX + 15, cardY + 127);
-
-  // Divider Line
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-  ctx.beginPath();
-  ctx.moveTo(cardX + 40, cardY + 160);
-  ctx.lineTo(cardX + cardW - 40, cardY + 160);
-  ctx.stroke();
-
-  let currY = cardY + 200;
-
-  // 3. Member 1 Section
-  const drawSectionLabel = (label: string, y: number) => {
-    ctx.font = 'bold 12px sans-serif';
-    ctx.fillStyle = '#34D399';
-    ctx.fillText(label.toUpperCase(), cardX + 40, y);
-  };
-
-  drawSectionLabel(data.isGroup ? 'Student Member 1' : 'Student Details', currY);
-  currY += 28;
-
-  ctx.font = 'bold 20px sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.fillText(data.name, cardX + 40, currY);
-  
-  const nameWidth = ctx.measureText(data.name).width;
-  ctx.font = '500 16px sans-serif';
-  ctx.fillStyle = '#9CA3AF';
-  ctx.fillText(`(Roll No. ${data.rollNumber})`, cardX + 55 + nameWidth, currY);
-  currY += 26;
-
-  if (data.projectTopic) {
-    ctx.font = '14px sans-serif';
-    ctx.fillStyle = '#9CA3AF';
-    ctx.fillText('Blue Book Project: ', cardX + 40, currY);
-    const lblW = ctx.measureText('Blue Book Project: ').width;
-    ctx.fillStyle = '#E5E7EB';
-    ctx.fillText(data.projectTopic, cardX + 40 + lblW, currY);
-    currY += 28;
-  }
-
-  // 4. Member 2 Section if group
-  if (data.isGroup && data.member2Name) {
-    currY += 15;
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-    ctx.beginPath();
-    ctx.moveTo(cardX + 40, currY);
-    ctx.lineTo(cardX + cardW - 40, currY);
-    ctx.stroke();
-    currY += 30;
-
-    drawSectionLabel('Student Member 2', currY);
-    currY += 28;
-
-    ctx.font = 'bold 20px sans-serif';
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillText(data.member2Name, cardX + 40, currY);
-
-    const m2NameW = ctx.measureText(data.member2Name).width;
-    ctx.font = '500 16px sans-serif';
-    ctx.fillStyle = '#9CA3AF';
-    ctx.fillText(`(Roll No. ${data.member2RollNumber || 'N/A'})`, cardX + 55 + m2NameW, currY);
-    currY += 26;
-
-    if (data.member2ProjectTopic) {
-      ctx.font = '14px sans-serif';
-      ctx.fillStyle = '#9CA3AF';
-      ctx.fillText('Blue Book Project: ', cardX + 40, currY);
-      const lblW = ctx.measureText('Blue Book Project: ').width;
-      ctx.fillStyle = '#E5E7EB';
-      ctx.fillText(data.member2ProjectTopic, cardX + 40 + lblW, currY);
-      currY += 28;
+  // If an already rendered DOM element is provided (e.g. from the modal or confirmation screen), capture it directly
+  if (existingElement) {
+    try {
+      const dataUrl = await toPng(existingElement, {
+        cacheBust: true,
+        pixelRatio: 3,
+        backgroundColor: '#f5f9f6',
+      });
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      return;
+    } catch (err) {
+      console.warn('Failed to capture existing DOM element, falling back to offscreen renderer:', err);
     }
   }
 
-  // 5. Seminar Presentation Topic Section Box
-  currY += 20;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
-  ctx.beginPath();
-  ctx.moveTo(cardX + 40, currY);
-  ctx.lineTo(cardX + cardW - 40, currY);
-  ctx.stroke();
-  currY += 35;
-
-  drawSectionLabel('Registered Seminar Topic', currY);
-  currY += 32;
-
-  // Text Wrapping helper for Topic
-  const maxTopicWidth = cardW - 100;
-  ctx.font = 'bold 24px serif';
-  ctx.fillStyle = '#6EE7B7'; // Mint Topic Color
-
-  const words = data.topic.split(' ');
-  let line = '';
-  const lines: string[] = [];
-
-  for (let i = 0; i < words.length; i++) {
-    const testLine = line + words[i] + ' ';
-    const metrics = ctx.measureText(testLine);
-    if (metrics.width > maxTopicWidth && i > 0) {
-      lines.push(line);
-      line = words[i] + ' ';
-    } else {
-      line = testLine;
-    }
-  }
-  lines.push(line);
-
-  lines.forEach(l => {
-    ctx.fillText(l.trim(), cardX + 40, currY);
-    currY += 34;
+  // Format date & time
+  const isGroup = Boolean(data.isGroup || data.member2Name || data.member2RollNumber);
+  const regDateObj = data.createdAt ? new Date(data.createdAt) : new Date();
+  const dateFormatted = regDateObj.toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
   });
+  const timeFormatted = regDateObj.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  }).toLowerCase();
 
-  // 6. Verification Footer Stamp
-  const footerY = cardY + cardH - 50;
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-  ctx.beginPath();
-  ctx.moveTo(cardX + 40, footerY - 30);
-  ctx.lineTo(cardX + cardW - 40, footerY - 30);
-  ctx.stroke();
+  // Create an offscreen container matching the exact layout in the user's screenshot
+  const container = document.createElement('div');
+  container.style.position = 'fixed';
+  container.style.left = '-9999px';
+  container.style.top = '-9999px';
+  container.style.width = '540px';
+  container.style.zIndex = '-1000';
+  container.style.pointerEvents = 'none';
 
-  const timeStr = `Registered: ${new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })} • EVS Portal Verified`;
-  ctx.font = '12px monospace';
-  ctx.fillStyle = '#6B7280';
-  ctx.fillText(timeStr, cardX + 40, footerY);
+  container.innerHTML = `
+    <div style="width: 540px; background: #f5f9f6; padding: 36px 28px; border-radius: 28px; font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; border: 1px solid #d9e6dc; color: #112217;">
+      
+      <!-- Top Animated-style Success Badge -->
+      <div style="width: 60px; height: 60px; border-radius: 9999px; background: rgba(16, 185, 129, 0.2); display: flex; align-items: center; justify-content: center; margin-bottom: 16px; position: relative;">
+        <div style="position: absolute; inset: -4px; border-radius: 9999px; border: 1px solid rgba(16, 185, 129, 0.35);"></div>
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22 4 12 14.01 9 11.01"></polyline>
+        </svg>
+      </div>
 
-  ctx.textAlign = 'right';
-  ctx.fillText('Official Confirmation Stamp ✔', cardX + cardW - 40, footerY);
+      <!-- Heading -->
+      <h2 style="font-size: 26px; font-weight: 800; color: #0d1e14; margin: 0 0 4px 0; text-align: center; letter-spacing: -0.025em;">Registration Confirmed!</h2>
+      
+      <!-- Subtitle -->
+      <p style="font-size: 13px; font-weight: 500; color: #5a7363; margin: 0 0 24px 0; text-align: center;">Symbiosis SCAC • Grade 12 EVS Official Record</p>
 
-  // Trigger PNG download
-  const link = document.createElement('a');
-  link.download = `EVS_Registration_Div${data.division}_Roll${data.rollNumber}.png`;
-  link.href = canvas.toDataURL('image/png');
-  link.click();
+      <!-- Inner White Card -->
+      <div style="width: 100%; background: #ffffff; border: 1px solid #e1ece4; border-radius: 20px; padding: 22px; box-sizing: border-box; box-shadow: 0 2px 10px rgba(0,0,0,0.03);">
+        
+        <!-- Header: "REGISTRATION DETAILS" & "Division X • Format" -->
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf4ef; padding-bottom: 12px; margin-bottom: 14px;">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 0.05em; color: #166534; display: flex; align-items: center; gap: 6px; text-transform: uppercase;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#166534" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+              <path d="m9 12 2 2 4-4"></path>
+            </svg>
+            REGISTRATION DETAILS
+          </span>
+          <span style="font-size: 11px; font-weight: 600; padding: 3px 12px; border-radius: 9999px; background: #f5f9f6; border: 1px solid #dbe7de; color: #15291c;">
+            Division ${escapeHtml(data.division)} • ${isGroup ? 'Group' : 'Individual'}
+          </span>
+        </div>
+
+        <!-- Student 1 Details -->
+        <div style="margin-bottom: 14px;">
+          <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #728c7b; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">
+            ${isGroup ? 'STUDENT MEMBER 1' : 'STUDENT DETAILS'}
+          </span>
+          <p style="font-size: 16px; font-weight: 700; color: #0d1e14; margin: 0 0 4px 0;">
+            ${escapeHtml(data.name)} <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; font-weight: 400; color: #5a7363;">(Roll No. ${escapeHtml(String(data.rollNumber))})</span>
+          </p>
+          ${data.projectTopic ? `
+            <p style="font-size: 12.5px; color: #5a7363; margin: 0;">
+              Blue Book Project: <span style="color: #0d1e14; font-weight: 600;">${escapeHtml(data.projectTopic)}</span>
+            </p>
+          ` : ''}
+        </div>
+
+        <!-- Student 2 Details if Group -->
+        ${isGroup && data.member2Name ? `
+          <div style="border-top: 1px solid #edf4ef; padding-top: 12px; margin-bottom: 14px;">
+            <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #728c7b; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">
+              STUDENT MEMBER 2
+            </span>
+            <p style="font-size: 16px; font-weight: 700; color: #0d1e14; margin: 0 0 4px 0;">
+              ${escapeHtml(data.member2Name)} <span style="font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 12px; font-weight: 400; color: #5a7363;">(Roll No. ${escapeHtml(String(data.member2RollNumber || 'N/A'))})</span>
+            </p>
+            ${data.member2ProjectTopic ? `
+              <p style="font-size: 12.5px; color: #5a7363; margin: 0;">
+                Blue Book Project: <span style="color: #0d1e14; font-weight: 600;">${escapeHtml(data.member2ProjectTopic)}</span>
+              </p>
+            ` : ''}
+          </div>
+        ` : ''}
+
+        <!-- Seminar Topic -->
+        <div style="border-top: 1px solid #edf4ef; padding-top: 12px; margin-bottom: 14px;">
+          <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #166534; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">
+            REGISTERED SEMINAR TOPIC
+          </span>
+          <p style="font-size: 16px; font-weight: 700; color: #0d1e14; line-height: 1.35; margin: 0;">
+            ${escapeHtml(data.topic)}
+          </p>
+        </div>
+
+        <!-- Footer Row -->
+        <div style="border-top: 1px solid #edf4ef; padding-top: 12px; display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; color: #5a7363;">
+          <span>Submitted: ${dateFormatted}, ${timeFormatted}</span>
+          ${data.hasUploaded ? `
+            <span style="color: #059669; font-weight: 600; background: #ecfdf5; padding: 2px 8px; border-radius: 6px; border: 1px solid #a7f3d0;">
+              Presentation File: Uploaded
+            </span>
+          ` : `
+            <span style="color: #d97706; font-weight: 600;">
+              Presentation File: Pending
+            </span>
+          `}
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(container);
+
+  try {
+    const dataUrl = await toPng(container.firstElementChild as HTMLElement, {
+      cacheBust: true,
+      pixelRatio: 3,
+      backgroundColor: '#f5f9f6',
+    });
+
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = dataUrl;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  } catch (err) {
+    console.error('Failed to generate receipt image:', err);
+  } finally {
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
+  }
+}
+
+function escapeHtml(text: string): string {
+  if (!text) return '';
+  return text
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
