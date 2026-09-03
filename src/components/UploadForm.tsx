@@ -22,7 +22,7 @@ const divisionOptions = [
 ];
 
 // Target professor / submission inbox email address
-const DEFAULT_SUBMISSION_EMAIL = 'ayushh108@gmail.com';
+const DEFAULT_SUBMISSION_EMAIL = 'seema.mohite@symbiosiscollege.edu.in';
 
 // Official date when presentation submissions open
 const SUBMISSION_OPEN_DATE = new Date('2026-09-01T00:00:00+05:30');
@@ -165,7 +165,7 @@ ${studentDetails.name}`
            --------------------------------------------------------- */}
         <AnimatePresence>
           {isBeforeOpeningDate && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
