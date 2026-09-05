@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, ChevronDown, Check, Copy, HelpCircle, BookOpenCheck, ChevronUp, GraduationCap, Users } from 'lucide-react';
 import KineticHeading from './KineticHeading';
@@ -6,16 +7,88 @@ import { INTERNAL_ASSIGNMENTS, BOARD_ASSIGNMENTS } from '../data/assignmentsData
 import type { InternalAssignment, BoardAssignmentDivision } from '../data/assignmentsData';
 
 const Assignments = () => {
-  const [activeTab, setActiveTab] = useState<'internal' | 'board'>('internal');
-  const [openAssignmentId, setOpenAssignmentId] = useState<number | null>(1);
-  
-  // Board Assignment state: selected division defaults to 'Division A'
-  const [selectedDivisionName, setSelectedDivisionName] = useState<string>('Division A');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [activeTab, setActiveTab] = useState<'internal' | 'board'>(() => {
+    const urlTab = searchParams.get('tab');
+    if (urlTab === 'internal' || urlTab === 'board') return urlTab;
+    const storedTab = localStorage.getItem('evs_assignments_tab');
+    if (storedTab === 'internal' || storedTab === 'board') return storedTab as 'internal' | 'board';
+    return 'internal';
+  });
+
+  const [openAssignmentId, setOpenAssignmentId] = useState<number | null>(() => {
+    const storedId = localStorage.getItem('evs_open_assignment_id');
+    if (storedId) {
+      const parsed = parseInt(storedId, 10);
+      if (!isNaN(parsed) && INTERNAL_ASSIGNMENTS.some((a) => a.id === parsed)) {
+        return parsed;
+      }
+    }
+    return 1;
+  });
+
+  // Board Assignment state: persisted via URL & localStorage, defaulting to 'Division A'
+  const [selectedDivisionName, setSelectedDivisionName] = useState<string>(() => {
+    const urlDiv = searchParams.get('div');
+    if (urlDiv) {
+      const match = BOARD_ASSIGNMENTS.find(
+        (d) => d.division.toLowerCase() === urlDiv.toLowerCase()
+      );
+      if (match) return match.division;
+    }
+    const storedDiv = localStorage.getItem('evs_selected_division');
+    if (storedDiv && BOARD_ASSIGNMENTS.some((d) => d.division === storedDiv)) {
+      return storedDiv;
+    }
+    return 'Division A';
+  });
+
   const [expandedAnswerId, setExpandedAnswerId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
+  const handleTabChange = (tab: 'internal' | 'board') => {
+    setActiveTab(tab);
+    localStorage.setItem('evs_assignments_tab', tab);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('tab', tab);
+        if (tab === 'board') {
+          next.set('div', selectedDivisionName);
+        } else {
+          next.delete('div');
+        }
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
+  const handleDivisionChange = (division: string) => {
+    setSelectedDivisionName(division);
+    localStorage.setItem('evs_selected_division', division);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set('tab', 'board');
+        next.set('div', division);
+        return next;
+      },
+      { replace: true }
+    );
+  };
+
   const toggleAssignment = (id: number) => {
-    setOpenAssignmentId((prev) => (prev === id ? null : id));
+    setOpenAssignmentId((prev) => {
+      const next = prev === id ? null : id;
+      if (next !== null) {
+        localStorage.setItem('evs_open_assignment_id', next.toString());
+      } else {
+        localStorage.removeItem('evs_open_assignment_id');
+      }
+      return next;
+    });
   };
 
   const toggleAnswer = (key: string) => {
@@ -67,7 +140,7 @@ const Assignments = () => {
         <button
           role="tab"
           aria-selected={activeTab === 'internal'}
-          onClick={() => setActiveTab('internal')}
+          onClick={() => handleTabChange('internal')}
           className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg font-medium text-xs sm:text-sm transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
             activeTab === 'internal'
               ? 'bg-surface text-ink shadow-sm border border-border/60 font-semibold'
@@ -80,7 +153,7 @@ const Assignments = () => {
         <button
           role="tab"
           aria-selected={activeTab === 'board'}
-          onClick={() => setActiveTab('board')}
+          onClick={() => handleTabChange('board')}
           className={`flex-1 flex items-center justify-center gap-1.5 sm:gap-2 py-2 sm:py-2.5 px-2 sm:px-4 rounded-lg font-medium text-xs sm:text-sm transition-all whitespace-nowrap focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
             activeTab === 'board'
               ? 'bg-surface text-ink shadow-sm border border-border/60 font-semibold'
@@ -330,7 +403,7 @@ const Assignments = () => {
                   return (
                     <button
                       key={div.division}
-                      onClick={() => setSelectedDivisionName(div.division)}
+                      onClick={() => handleDivisionChange(div.division)}
                       aria-pressed={isSelected}
                       aria-label={`Select ${div.division}`}
                       className={`py-2.5 sm:py-3 px-2 sm:px-3 rounded-xl font-medium text-xs sm:text-sm flex items-center justify-center transition-all focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none ${
