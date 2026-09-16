@@ -161,34 +161,30 @@ ${studentDetails.name}`
         </div>
 
         {/* ---------------------------------------------------------
-            AUTOMATED SEPTEMBER 1ST OPENING NOTICE & BARRIER
+            OFFICIAL PRESENTATION SCHEDULE NOTICE
            --------------------------------------------------------- */}
-        <AnimatePresence>
-          {isBeforeOpeningDate && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 space-y-2.5 shadow-sm relative overflow-hidden"
-            >
-              <div className="flex items-center gap-2.5 font-heading font-semibold text-sm sm:text-base text-amber-800 dark:text-amber-300">
-                <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-600 dark:text-amber-400">
-                  <Calendar className="w-4 h-4" />
-                </div>
-                <div>
-                  <span>Submissions Open September 1, 2026</span>
-                  <span className="block text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400 opacity-90 mt-0.5">
-                    Official Notice
-                  </span>
-                </div>
-              </div>
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/25 text-amber-900 dark:text-amber-200 space-y-2.5 shadow-sm relative overflow-hidden">
+          <div className="flex items-center gap-2.5 font-heading font-semibold text-sm sm:text-base text-amber-800 dark:text-amber-300">
+            <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-600 dark:text-amber-400">
+              <Calendar className="w-4 h-4" />
+            </div>
+            <div>
+              <span>Presentation Schedule Notice</span>
+              <span className="block text-[10px] uppercase font-bold tracking-wider text-amber-700 dark:text-amber-400 opacity-90 mt-0.5">
+                Official Notice
+              </span>
+            </div>
+          </div>
 
-              <p className="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans pt-1">
-                Please note that presentation submissions will officially open on <strong>September 1, 2026</strong>. Kindly finalize your slides and project work in advance. The online submission portal will automatically activate starting September 1st.
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+          <p className="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans pt-1">
+            Please note that presentations start from <strong>26th September</strong> and the last date is <strong>30th of October</strong>. Please verify your details below and prepare your presentation slides accordingly.
+          </p>
+
+          <div className="flex items-center gap-2.5 pt-1 text-xs text-amber-950 dark:text-amber-200 flex-wrap">
+            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20 font-medium">Starts: <strong>26th Sept</strong></span>
+            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20 font-medium">Last Date: <strong>30th Oct</strong></span>
+          </div>
+        </div>
 
         <AnimatePresence mode="wait">
           {error && (

@@ -7,6 +7,7 @@ import Guidelines from './components/Guidelines';
 import ViewTopics from './components/ViewTopics';
 import Assignments from './components/Assignments';
 import AdminPanel from './components/AdminPanel';
+import NoticeBanner from './components/NoticeBanner';
 
 function App() {
   return (
@@ -18,7 +19,8 @@ function App() {
         <Navbar />
         
         {/* Main Content Area adapted for mobile and desktop */}
-        <main className="w-full relative z-10 flex flex-col items-center justify-center pt-24 sm:pt-28 md:pt-32 pb-24 md:pb-12 flex-grow">
+        <main className="w-full relative z-10 flex flex-col items-center justify-start pt-24 sm:pt-28 md:pt-32 pb-24 md:pb-12 flex-grow">
+          <NoticeBanner />
           <Routes>
             {/* Default to register */}
             <Route path="/" element={<Navigate to="/register" replace />} />
