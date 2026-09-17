@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, ChevronDown, ChevronUp, Bell, Sparkles, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, ChevronDown, ChevronUp, Bell, ArrowRight } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 export default function NoticeBanner() {
