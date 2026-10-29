@@ -177,12 +177,12 @@ ${studentDetails.name}`
           </div>
 
           <p className="text-xs sm:text-sm text-amber-900/90 dark:text-amber-200/90 leading-relaxed font-sans pt-1">
-            Please note that presentations start from <strong>26th September</strong> and the last date is <strong>30th of October</strong>. Please verify your details below and prepare your presentation slides accordingly.
+            Please note that presentations start from <strong>15th November</strong> and the last date is <strong>20th of December</strong>. Please verify your details below and prepare your presentation slides accordingly.
           </p>
 
           <div className="flex items-center gap-2.5 pt-1 text-xs text-amber-950 dark:text-amber-200 flex-wrap">
-            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20 font-medium">Starts: <strong>26th Sept</strong></span>
-            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20 font-medium">Last Date: <strong>30th Oct</strong></span>
+            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20 font-medium">Starts: <strong>15th Nov</strong></span>
+            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20 font-medium">Last Date: <strong>20th Decembert</strong></span>
           </div>
         </div>
 

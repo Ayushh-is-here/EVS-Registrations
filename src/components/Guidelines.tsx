@@ -5,7 +5,7 @@ import KineticHeading from './KineticHeading';
 
 const Guidelines = () => {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: "easeOut" }}
@@ -38,7 +38,7 @@ const Guidelines = () => {
               </div>
 
               <p className="text-xs sm:text-sm text-ink-light leading-relaxed font-body">
-                Please note that presentations start from <strong className="text-ink font-semibold">26th September</strong> and the last date is <strong className="text-ink font-semibold">30th of October</strong>. Ensure your slides and topic preparations are finished well in advance.
+                Please note that presentations start from <strong className="text-ink font-semibold">15th November</strong> and the last date is <strong className="text-ink font-semibold">20th of December</strong>. Ensure your slides and topic preparations are finished well in advance.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
@@ -46,7 +46,7 @@ const Guidelines = () => {
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0" />
                   <div className="text-xs">
                     <span className="text-ink-light block text-[10px] uppercase tracking-wider font-semibold">Commencement</span>
-                    <span className="font-semibold text-ink">26th September</span>
+                    <span className="font-semibold text-ink">15th November</span>
                   </div>
                 </div>
 
@@ -54,7 +54,7 @@ const Guidelines = () => {
                   <div className="w-2.5 h-2.5 rounded-full bg-amber-500 flex-shrink-0" />
                   <div className="text-xs">
                     <span className="text-ink-light block text-[10px] uppercase tracking-wider font-semibold">Last Date</span>
-                    <span className="font-semibold text-ink">30th October</span>
+                    <span className="font-semibold text-ink"> 20th December</span>
                   </div>
                 </div>
               </div>

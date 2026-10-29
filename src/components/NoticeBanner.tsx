@@ -57,7 +57,7 @@ export default function NoticeBanner() {
                 Important Notice:
               </span>
               <span className="text-ink-light truncate font-body text-[11px] sm:text-xs">
-                Presentations start <strong>26th Sept</strong> • Last date <strong>30th Oct</strong>
+                Presentations start <strong>15th Nov</strong> • Last date <strong>20th Dec</strong>
               </span>
             </button>
 
@@ -116,7 +116,7 @@ export default function NoticeBanner() {
 
               {/* Main schedule description */}
               <p className="text-xs sm:text-sm text-ink-light leading-relaxed font-body">
-                Please note that <strong className="text-ink font-semibold">presentations start from 26th September</strong> and the <strong className="text-ink font-semibold">last date is 30th of October</strong>. Make sure to complete your topic registration and organize your presentation slides on time.
+                Please note that <strong className="text-ink font-semibold">presentations start from 15th November</strong> and the <strong className="text-ink font-semibold">last date is 20th of December</strong>. Make sure to complete your topic registration and organize your presentation slides on time.
               </p>
 
               {/* Date Highlight Chips & Actions */}
@@ -124,12 +124,12 @@ export default function NoticeBanner() {
                 <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border/60 shadow-sm text-xs font-medium text-ink">
                     <Calendar className="w-3.5 h-3.5 text-accent flex-shrink-0" />
-                    <span>Starts: <strong className="font-semibold text-accent">26th September</strong></span>
+                    <span>Starts: <strong className="font-semibold text-accent">15th November</strong></span>
                   </div>
 
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-surface border border-border/60 shadow-sm text-xs font-medium text-ink">
                     <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400 flex-shrink-0" />
-                    <span>Last Date: <strong className="font-semibold text-amber-700 dark:text-amber-400">30th October</strong></span>
+                    <span>Last Date: <strong className="font-semibold text-amber-700 dark:text-amber-400">20th December</strong></span>
                   </div>
                 </div>
 
